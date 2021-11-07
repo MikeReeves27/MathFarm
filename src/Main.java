@@ -27,7 +27,6 @@ public class Main{
 	private JPanel headerPanel;
 	private JLayeredPane layeredPane;
 	private JPanel homePanel;
-	private JPanel parentPanel;
 	private JPanel gradePanel;
 	private JPanel learnPracticePanel;
 	private JPanel learnPanel;
@@ -42,8 +41,14 @@ public class Main{
 	// Global int for user's grade selection
 	private int gradeSelection;
 	
+	// Global array for panel hierarchy (used for Back button and header titles)
+	private JPanel[] panelList = new JPanel[10];
+	private String[] panelTitle = new String[10];
+	private int panelCounter = 0;
+	
 	// Global array for clickable button RGB values
 	private int[] GREEN_RGB = {146, 208, 80};
+	private int[] SKY_RGB = {139, 197, 219};
 	
 	// Launch the application
 	public static void main(String[] args) {
@@ -108,8 +113,6 @@ public class Main{
 	////////// HEADER PANEL //////////
 	public void createHeaderPanel() {
 		
-		// RGB values for darkest part of sky: (139, 197, 219)
-		
 		headerPanel = new JPanel();
 		headerPanel.setBounds(PRIMARY_RATIO, PRIMARY_RATIO, frame.getWidth() - FRAME_WIDTH_BUFFER - PRIMARY_RATIO * 2, PRIMARY_RATIO * 3);
 		frame.getContentPane().add(headerPanel);
@@ -129,49 +132,37 @@ public class Main{
 		headerLabel.setBorder(raisedbevel);
 		
 		// Home button
-		Image home = new ImageIcon(this.getClass().getResource("/homeButton.png")).getImage().getScaledInstance(headerPanel.getHeight(), headerPanel.getHeight(), java.awt.Image.SCALE_SMOOTH);
 		JButton homeButton = new JButton();
 		headerPanel.add(homeButton);
 		
 		// Set button height/width to headerPanel height
-		homeButton.setBounds(0, 0, headerPanel.getHeight(), headerPanel.getHeight());
-		homeButton.setIcon(new ImageIcon(home));
-		homeButton.setBorderPainted(false);
-		homeButton.setContentAreaFilled(false); 
-		homeButton.setFocusPainted(false); 
-		homeButton.setOpaque(true);
-		homeButton.setBackground(new Color(139, 197, 219));
+		createButton(homeButton, 0, 0, headerPanel.getHeight(), headerPanel.getHeight(), SKY_RGB, "/homeButton.png", headerPanel.getHeight(), headerPanel.getHeight());
 		
 		// When clicked, return to HOME PANEL
 		homeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				switchPanel(homePanel);
-				headerLabel.setText("HOME");
+				panelCounter = 0;
+				headerLabel.setText(panelTitle[panelCounter]);
 			}
 		});
 		
 		// Back button
-		Image back = new ImageIcon(this.getClass().getResource("/homeButton.png")).getImage().getScaledInstance(headerPanel.getHeight(), headerPanel.getHeight(), java.awt.Image.SCALE_SMOOTH);
 		JButton backButton = new JButton();
 		headerPanel.add(backButton);
 		
 		// Set button height/width to headerPanel height
-		backButton.setBounds((headerPanel.getWidth() / 4 - headerPanel.getHeight() * 2) / 2 + headerPanel.getHeight(), 0, headerPanel.getHeight(), headerPanel.getHeight());
-		backButton.setIcon(new ImageIcon(back));
-		backButton.setBorderPainted(false);
-		backButton.setContentAreaFilled(false); 
-		backButton.setFocusPainted(false); 
-		backButton.setOpaque(true);
-		backButton.setBackground(new Color(139, 197, 219));
+		createButton(backButton, (headerPanel.getWidth() / 4 - headerPanel.getHeight() * 2) / 2 + headerPanel.getHeight(), 0, headerPanel.getHeight(), headerPanel.getHeight(), SKY_RGB, "/backButton.png", headerPanel.getHeight(), headerPanel.getHeight());
 		
-		// Initialize parent panel
-		parentPanel = homePanel;
-		
-		// When clicked, return to PARENT PANEL
+		// When clicked, return to previous panel
 		backButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				switchPanel(parentPanel);
-				headerLabel.setText("HOME");
+				
+				if (panelCounter != 0) {
+					switchPanel(panelList[--panelCounter]);
+					headerLabel.setText(panelTitle[panelCounter]);
+				}
+				
 			}
 		});
 		
@@ -184,6 +175,10 @@ public class Main{
 		layeredPane.add(homePanel, "name_180568393921300");
 		homePanel.setBackground(new Color(0, 0, 0, 0));
 		homePanel.setLayout(null);
+		
+		panelList[panelCounter] = homePanel;
+		panelTitle[panelCounter] = "HOME";
+		headerLabel.setText(panelTitle[panelCounter]);
 		
 		// Array for each home panel animal button
 		JButton[] homePanelButtons = new JButton[5];
@@ -201,16 +196,8 @@ public class Main{
 		for (int i = 0; i < 5; i++) {
 			
 			homePanelButtons[i] = new JButton("");
-			homePanelButtons[i].setBorder(BorderFactory.createBevelBorder(0));
-			homePanelButtons[i].setBounds(homePanelButtonXCoordinate, layeredPane.getHeight() / 2, PRIMARY_RATIO * 6, layeredPane.getHeight() / 2);
-			Image homePanelAnimalImage = new ImageIcon(this.getClass().getResource(homePanelAnimalImages[i])).getImage().getScaledInstance((int) (PRIMARY_RATIO * 5 * homePanelAnimalRatios[i]), PRIMARY_RATIO * 5, java.awt.Image.SCALE_SMOOTH);
+			createButton(homePanelButtons[i], homePanelButtonXCoordinate, layeredPane.getHeight() / 2, PRIMARY_RATIO * 6, layeredPane.getHeight() / 2, GREEN_RGB, homePanelAnimalImages[i], (int) (PRIMARY_RATIO * 5 * homePanelAnimalRatios[i]), PRIMARY_RATIO * 5);
 			homePanel.add(homePanelButtons[i]);
-			homePanelButtons[i].setIcon(new ImageIcon(homePanelAnimalImage));
-			homePanelButtons[i].setBorderPainted(false); 
-			homePanelButtons[i].setContentAreaFilled(false); 
-			homePanelButtons[i].setFocusPainted(false); 
-			homePanelButtons[i].setOpaque(true);
-			homePanelButtons[i].setBackground(new Color(GREEN_RGB[0], GREEN_RGB[1], GREEN_RGB[2]));
 			homePanelButtonXCoordinate += (layeredPane.getWidth() - PRIMARY_RATIO * 6) / 4;
 			
 			// Set j equal to i for button click method
@@ -223,8 +210,10 @@ public class Main{
 					// Set user's grade selection to current index
 					gradeSelection = j;
 					
-					parentPanel = homePanel;
 					createGradePanel(gradeSelection);
+					panelList[++panelCounter] = gradePanel;
+					panelTitle[panelCounter] = "GRADE";
+					headerLabel.setText(panelTitle[panelCounter]);
 					switchPanel(gradePanel);
 					
 				}
@@ -241,9 +230,6 @@ public class Main{
 		gradePanel.setBackground(new Color(0, 0, 0, 0));
 		gradePanel.setLayout(null);
 		
-		// Update headerLabel text
-		headerLabel.setText("GRADE MENU");
-		
 		// Array for each grade panel button
 		JButton[] gradePanelButtons = new JButton[5];
 		
@@ -255,7 +241,8 @@ public class Main{
 				{"ARITHMETIC", "FRACTIONS", "MEASURE", "GEOMETRY"} };
 		
 		// [This will change. Insert grade images here]
-		String[] gradePanelImages = {"/homeChicken.png", "/homePig.png", "/homeSheep.png", "/homeCow.png", "/homeHorse.png"};
+		String[] gradePanelImages = {"/countButton.png", "/addSubtractButton.png", "/compareButton.png", "/shapesButton.png", "/homeHorse.png"};
+		double[] gradePanelImageRatios = {0.94, 2.11, 1.49, 0.92};
 		
 		int gradePanelButtonXCoordinate = 0;
 		int gradePanelButtonYCoordinate = 0;
@@ -278,7 +265,7 @@ public class Main{
 			}
 			
 			// Draw image and print text on each button
-			Image gradePanelImage = new ImageIcon(this.getClass().getResource(gradePanelImages[i])).getImage().getScaledInstance((int) (PRIMARY_RATIO * 5 ), PRIMARY_RATIO * 5, java.awt.Image.SCALE_SMOOTH);
+			Image gradePanelImage = new ImageIcon(this.getClass().getResource(gradePanelImages[i])).getImage().getScaledInstance((int) (PRIMARY_RATIO * 5), PRIMARY_RATIO * 5, java.awt.Image.SCALE_SMOOTH);
 			JLabel buttonImage = new JLabel();
 			JLabel buttonText = new JLabel();
 			gradePanelButtons[i].setLayout(null);
@@ -306,8 +293,10 @@ public class Main{
 			gradePanelButtons[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 					
-					parentPanel = gradePanel;
 					createLearnPracticePanel(gradeSelection);
+					panelList[++panelCounter] = learnPracticePanel;
+					panelTitle[panelCounter] = "LEARN OR PRACTICE";
+					headerLabel.setText(panelTitle[panelCounter]);
 					switchPanel(learnPracticePanel);
 					
 				}
@@ -324,14 +313,14 @@ public class Main{
 		learnPracticePanel.setBackground(new Color(0, 0, 0, 0));
 		learnPracticePanel.setLayout(null);
 		
-		// Update headerLabel text
-		headerLabel.setText("LEARN OR PRACTICE");
-		
 		// Grade K Count screen: Learn button
 		JButton gradeKLearnButton = new JButton("");
 		gradeKLearnButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				createLearnPanel(gradeSelection);
+				panelList[++panelCounter] = learnPanel;
+				panelTitle[panelCounter] = "LEARN";
+				headerLabel.setText(panelTitle[panelCounter]);
 				switchPanel(learnPanel);
 			}
 		});
@@ -353,6 +342,9 @@ public class Main{
 		gradeKPracticeButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				createPracticePanel(gradeSelection);
+				panelList[++panelCounter] = practicePanel;
+				panelTitle[panelCounter] = "PRACTICE";
+				headerLabel.setText(panelTitle[panelCounter]);
 				switchPanel(practicePanel);
 			}
 		});
@@ -377,9 +369,6 @@ public class Main{
 		layeredPane.add(learnPanel, "name_180577775611500");
 		learnPanel.setBackground(new Color(0, 0, 0, 0));
 		learnPanel.setLayout(null);
-		
-		// Update headerLabel text
-		headerLabel.setText("LEARN");
 		
 		//Learn links button
 		JButton gradeKLearnLinks = new JButton("");
@@ -411,9 +400,10 @@ public class Main{
 		gradeKLearnButton.setFocusPainted(false);
 		gradeKLearnButton.setOpaque(true);
 		gradeKLearnButton.setBackground(new Color(145, 210, 80));
-	
+		
 	
 	}
+	
 	
 	////////// PRACTICE PANEL //////////
 	public void createPracticePanel(int grade) {
@@ -421,9 +411,6 @@ public class Main{
 		layeredPane.add(practicePanel, "name_180577775611500");
 		practicePanel.setBackground(new Color(0, 0, 0, 0));
 		practicePanel.setLayout(null);
-		
-		// Update headerLabel text
-		headerLabel.setText("PRACTICE");
 		
 		//Practice content button
 		JButton practiceContentButton = new JButton("");
@@ -458,6 +445,18 @@ public class Main{
 		}
 	
 	
+	}
+	
+	// Create button with image
+	public void createButton(JButton button, int x, int y, int width, int height, int[] rgb, String image, int imageWidth, int imageHeight) {
+		button.setBounds(x, y, width, height);
+		button.setBorderPainted(false); 
+		button.setContentAreaFilled(false); 
+		button.setFocusPainted(false); 
+		button.setOpaque(true);
+		button.setBackground(new Color(rgb[0], rgb[1], rgb[2]));
+		Image buttonImage = new ImageIcon(this.getClass().getResource(image)).getImage().getScaledInstance(imageWidth, imageHeight, java.awt.Image.SCALE_SMOOTH);
+		button.setIcon(new ImageIcon(buttonImage));
 	}
 	
 	
