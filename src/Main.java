@@ -8,19 +8,25 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.EventQueue;
 import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Random;
 
 import javax.swing.BorderFactory;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
+import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 public class Main {
 
@@ -52,6 +58,7 @@ public class Main {
 	// Global array for clickable button RGB values
 	private int[] GREEN_RGB = { 146, 208, 80 };
 	private int[] SKY_RGB = { 139, 197, 219 };
+	private int[] DARK_GREEN_RGB = { 0, 176, 80 };
 
 	// Set raised bevel border variable
 	Border raisedbevel = BorderFactory.createRaisedBevelBorder();
@@ -137,7 +144,6 @@ public class Main {
 		headerLabel.setBounds(headerPanel.getWidth() / 4, 0, headerPanel.getWidth() / 2, headerPanel.getHeight());
 		headerPanel.add(headerLabel);
 		headerLabel.setOpaque(true);
-		Border raisedbevel = BorderFactory.createRaisedBevelBorder();
 		headerLabel.setBorder(raisedbevel);
 
 		// Home button
@@ -347,8 +353,7 @@ public class Main {
 		learnPracticePanel.setBackground(new Color(0, 0, 0, 0));
 		learnPracticePanel.setLayout(null);
 
-		// Arrays for the Learn and Practice buttons
-		// Arrays for button images and ratios
+		// Arrays for the Learn/Practice buttons, images, and ratios
 		JButton[] learnPracticeButtons = new JButton[2];
 		String[][] learnPracticeImages = { { "/learnChicken.png", "/practiceChicken.png" } };
 		double[][] learnPracticeImageRatios = { { 0.7, 0.61 } };
@@ -399,7 +404,7 @@ public class Main {
 
 	////////// LEARN PANEL //////////
 	public void createLearnPanel(int grade) {
-		learnPanel = new JPanel();
+		learnPanel = new JPanel(new GridLayout());
 		layeredPane.add(learnPanel, "name_180577775611500");
 		learnPanel.setBackground(new Color(0, 0, 0, 0));
 		learnPanel.setLayout(null);
@@ -407,35 +412,54 @@ public class Main {
 		// Update headerLabel text
 		headerLabel.setText("LEARN");
 
-		// Learn links button
-		JButton gradeKLearnLinks = new JButton("");
-		gradeKLearnLinks.setBounds(105, 25, 1000, 400);
+		// Learn links list
+		DefaultListModel<String> dlm = new DefaultListModel<>();
+		JList<String> gradeKLearnLinks = new JList<>(dlm);
+		gradeKLearnLinks.addListSelectionListener(new ListSelectionListener() {
+			public void valueChanged(ListSelectionEvent e) {
+				@SuppressWarnings("unchecked")
+				JList<String> list = (JList<String>) e.getSource();
+				if (!e.getValueIsAdjusting()) {
+					int index = list.getSelectedIndex();
+					if (index != -1) {
+						String address = list.getSelectedValue();
+						Browser.openWebpage(address);
+					}
+				}
+			}
+		});
+
+		// DefaultListCellRenderer dlcf =
+		// (DefaultListCellRenderer)gradeKLearnLinks.getCellRenderer();
+		// dlcf.setHorizontalAlignment(JLabel.CENTER);
+		gradeKLearnLinks.setBounds(755, 50, 332, 380);
+		// JScrollPane jsp = new JScrollPane(gradeKLearnLinks);
+		// jsp.setPreferredSize(new Dimension(1000,800));
 		learnPanel.add(gradeKLearnLinks);
-		gradeKLearnLinks.setBorderPainted(true);
+		// learnPanel.add(jsp);
+		// gradeKLearnLinks.setBorderPainted(true);
 		gradeKLearnLinks.setBorder(raisedbevel);
-		gradeKLearnLinks.setContentAreaFilled(false);
-		gradeKLearnLinks.setFocusPainted(false);
+		// gradeKLearnLinks.setContentAreaFilled(false);
+		// gradeKLearnLinks.setFocusPainted(false);
 		gradeKLearnLinks.setOpaque(true);
 		gradeKLearnLinks.setBackground(new Color(145, 210, 80));
 
 		// Creating Hyper links
-		JLabel[] hyperlinks = new JLabel[3];
-		int hyperlinksXCoordinate = 150;
-		int hyperlinksYCoordinate = 350;
+		String[] hyperlinks = { "https://www.youtube.com/watch?v=mvOkMYCygps&ab_channel=KhanAcademy",
+				"https://www.youtube.com/watch?v=MTzTqvzWzm8&ab_channel=KhanAcademy",
+				"https://www.youtube.com/watch?v=i6sbjtJjJ-A&ab_channel=TheOrganicChemistryTutor",
+				"https://www.youtube.com/watch?v=sOE8Slo3Pqw&ab_channel=ScienceandMathsbyPrimroseKitten",
+				"https://www.youtube.com/watch?v=Vuj5CZDy-Pc&ab_channel=MathandScience" };
+		JLabel[] labels = new JLabel[hyperlinks.length];
 
-		for (int i = 0; i < 3; i++) {
-			hyperlinks[i] = new JLabel("Hyperlink number" + (i + 1));
-			hyperlinks[i].setBackground(Color.BLUE);
-			hyperlinks[i].setBounds(hyperlinksXCoordinate, hyperlinksYCoordinate,
-					(layeredPane.getWidth() - PRIMARY_RATIO * 2) / 6, (layeredPane.getHeight() - PRIMARY_RATIO) / 5);
-			hyperlinksXCoordinate = hyperlinksXCoordinate + (layeredPane.getWidth() - PRIMARY_RATIO * 2) / 4
-					+ PRIMARY_RATIO;
-			// System.out.println(PRIMARY_RATIO + " " + layeredPane.getWidth() + " " +
-			// hyperlinksXCoordinate);
-			hyperlinks[i].setOpaque(false);
-			gradeKLearnLinks.add(hyperlinks[i]);
+		for (int i = 0; i < hyperlinks.length; i++) {
+			labels[i] = new JLabel(hyperlinks[i]);
+			labels[i].setBackground(Color.BLUE);
+
+			dlm.addElement(hyperlinks[i]);
 		}
 
+		learnPanel.setVisible(true);
 	}
 
 	////////// PRACTICE PANEL //////////
@@ -448,54 +472,69 @@ public class Main {
 		// Update headerLabel text
 		headerLabel.setText("PRACTICE");
 
-		// Practice Panel button
-		JButton gradeKPracticePanelButton = new JButton("Question goes here");
-		gradeKPracticePanelButton.setBounds(105, 0, 1000, 350);
-		practicePanel.add(gradeKPracticePanelButton);
-		gradeKPracticePanelButton.setBorderPainted(true);
-		gradeKPracticePanelButton.setBorder(raisedbevel);
-		gradeKPracticePanelButton.setContentAreaFilled(false);
-		gradeKPracticePanelButton.setFocusPainted(false);
-		gradeKPracticePanelButton.setOpaque(true);
-		gradeKPracticePanelButton.setBackground(new Color(0, 176, 80));
+		// Set practice panel width and height
+		int panelWidth = layeredPane.getWidth() - PRIMARY_RATIO * 8;
+		int panelHeight = layeredPane.getHeight() - PRIMARY_RATIO * 4;
 
-		HowMany howMany = new HowMany(gradeSelection);
-		gradeKPracticePanelButton.setText(howMany.getQuestionText());
-		int[] answers = howMany.getAnswers();
-		String img = howMany.getImage();
-		Image questionImage = new ImageIcon(this.getClass().getResource(img)).getImage().getScaledInstance(100, 100,
+		// Create main background label for practice panel
+		JLabel practicePanelLabel = new JLabel();
+		practicePanelLabel.setBackground(new Color(DARK_GREEN_RGB[0], DARK_GREEN_RGB[1], DARK_GREEN_RGB[2]));
+		practicePanelLabel.setBounds(PRIMARY_RATIO * 4, 0, panelWidth, panelHeight);
+		practicePanel.add(practicePanelLabel);
+		practicePanelLabel.setOpaque(true);
+		practicePanelLabel.setBorder(raisedbevel);
+
+		// Create label for upper section of panel (question images)
+		JLabel practicePanelImageLabel = new JLabel();
+		practicePanelImageLabel.setVerticalAlignment(SwingConstants.CENTER);
+		practicePanelImageLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, headerPanel.getHeight() / 3));
+		practicePanelImageLabel.setForeground(Color.white);
+		practicePanelImageLabel.setBackground(new Color(DARK_GREEN_RGB[0], DARK_GREEN_RGB[1], DARK_GREEN_RGB[2]));
+		practicePanelImageLabel.setBounds(PRIMARY_RATIO, PRIMARY_RATIO, panelWidth - PRIMARY_RATIO * 2,
+				panelHeight - PRIMARY_RATIO * 4);
+		practicePanelLabel.add(practicePanelImageLabel);
+		practicePanelImageLabel.setOpaque(true);
+
+		// Create label for lower section of panel (question text)
+		JLabel practicePanelTextLabel = new JLabel();
+		practicePanelTextLabel.setBounds(PRIMARY_RATIO, panelHeight - PRIMARY_RATIO * 3, panelWidth - PRIMARY_RATIO * 2,
+				PRIMARY_RATIO * 2);
+		practicePanelLabel.add(practicePanelTextLabel);
+		practicePanelTextLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelTextLabel.getHeight() / 2));
+		practicePanelTextLabel.setForeground(Color.white);
+		practicePanelTextLabel.setHorizontalAlignment(SwingConstants.CENTER);
+		practicePanelTextLabel.setVerticalAlignment(SwingConstants.CENTER);
+
+		// Create button for selecting next question. Disable button by default
+		JButton nextQuestion = new JButton();
+		createButton(nextQuestion, layeredPane.getWidth() - ((layeredPane.getWidth() - panelWidth) / 2), 0,
+				(layeredPane.getWidth() - panelWidth) / 2, panelHeight, new int[] { 192, 192, 192 }, "", 1, 1, true);
+		practicePanel.add(nextQuestion);
+		nextQuestion.setOpaque(true);
+		nextQuestion.setEnabled(false);
+		nextQuestion.setVerticalAlignment(SwingConstants.CENTER);
+		Image nextQuestionImage = new ImageIcon(this.getClass().getResource("/next.png")).getImage().getScaledInstance(
+				nextQuestion.getWidth() - PRIMARY_RATIO, (int) ((nextQuestion.getWidth() - PRIMARY_RATIO) / 1.06),
 				java.awt.Image.SCALE_SMOOTH);
-		gradeKPracticePanelButton.setIcon(new ImageIcon(questionImage));
-		// Answer Selection Buttons
+		nextQuestion.setIcon(new ImageIcon(nextQuestionImage));
 
-		JButton[] answerSelectionButtons = new JButton[3];
-		int answerSelectionButtonXCoordinate = 150;
-		int answerSelectionButtonYCoordinate = 350;
+		// When button is clicked, reload practice panel
+		nextQuestion.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
 
-		for (int i = 0; i < 3; i++) {
-			answerSelectionButtons[i] = new JButton();
-			answerSelectionButtons[i].setText(String.valueOf(answers[i]));
-			answerSelectionButtons[i].setBackground(Color.BLUE);
+				createPracticePanel(gradeSelection);
+				switchPanel(practicePanel);
+			}
+		});
 
-			answerSelectionButtons[i].setBounds(answerSelectionButtonXCoordinate, answerSelectionButtonYCoordinate,
-					(layeredPane.getWidth() - PRIMARY_RATIO * 2) / 6, (layeredPane.getHeight() - PRIMARY_RATIO) / 5);
-			answerSelectionButtonXCoordinate = answerSelectionButtonXCoordinate
-					+ (layeredPane.getWidth() - PRIMARY_RATIO * 2) / 4 + PRIMARY_RATIO;
-			// System.out.println(PRIMARY_RATIO + " " + layeredPane.getWidth() + " " +
-			// answerSelectionButtonXCoordinate);
-			answerSelectionButtons[i].setBorderPainted(true);
-			answerSelectionButtons[i].setBorder(raisedbevel);
-			answerSelectionButtons[i].setContentAreaFilled(false);
-			answerSelectionButtons[i].setFocusPainted(false);
-			answerSelectionButtons[i].setOpaque(false);
-			answerSelectionButtons[i].setFocusPainted(false);
-			answerSelectionButtons[i].setOpaque(true);
-			practicePanel.add(answerSelectionButtons[i]);
-		}
+		// Choose a random question based on user's selected grade an cateogry
+		chooseQuestion(gradeSelection, categorySelection, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+				practicePanelLabel);
 
 	}
 
-	// Create button with image
+	////////// CREATE BUTTON //////////
 	public void createButton(JButton button, int x, int y, int width, int height, int[] rgb, String image,
 			int imageWidth, int imageHeight, boolean bevel) {
 		button.setBounds(x, y, width, height);
@@ -510,6 +549,168 @@ public class Main {
 		if (bevel) {
 			button.setBorder(raisedbevel);
 			button.setBorderPainted(true);
+		}
+	}
+
+	////////// CHOOSE QUESTION //////////
+	public void chooseQuestion(int gradeSelection, int categorySelection, JLabel practicePanelImageLabel,
+			JLabel practicePanelTextLabel, JButton nextQuestion, JLabel practicePanelLabel) {
+		Random rand = new Random();
+
+		// Switch for grade level (0-4)
+		switch (gradeSelection) {
+
+		// Grade K:
+		case 0:
+
+			// Switch for category selection
+			switch (categorySelection) {
+
+			// Grade K: Count
+			case 0:
+				int activity = rand.nextInt(2);
+				switch (activity) {
+
+				// Grade K: Count: How many
+				case 0:
+					createQuestionHowMany(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel);
+					break;
+
+				// Grade K: Count: Next sequence
+				case 1:
+					createQuestionNextSequence(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel);
+					break;
+				}
+			}
+		}
+	}
+
+	////////// QUESTION: GRADE K: CHOOSE HOW MANY ANIMALS THERE ARE //////////
+	public void createQuestionHowMany(JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
+			JButton nextQuestion, JLabel practicePanelLabel) {
+
+		// Create new HowMany object
+		HowMany howMany = new HowMany(gradeSelection);
+		practicePanelTextLabel.setText(howMany.getQuestionText());
+		String[] answers = howMany.getAnswers();
+		int correctAnswer = howMany.getCorrectAnswer();
+		int correctAnswerIndex = howMany.getCorrectAnswerIndex();
+		String img = howMany.getImage();
+		double imageRatio = howMany.getImageRatio();
+		int imageWidth = 0;
+		int imageHeight = 0;
+
+		// Create one sub panel for each animal image
+		JLabel[] practicePanelSubImage = new JLabel[correctAnswer];
+
+		// Set image sizes based on panel. If the total number of images and width goes
+		// beyond panel boundaries, resize all images to auto-fit
+		double imageSize = practicePanelImageLabel.getHeight();
+		int xImageCoordinate;
+		int yImageCoordinate = 0;
+		if (imageSize * correctAnswer > practicePanelImageLabel.getWidth()) {
+			imageSize = (practicePanelImageLabel.getWidth() / (imageSize * correctAnswer) * imageSize);
+			xImageCoordinate = 0;
+			yImageCoordinate = (int) (practicePanelImageLabel.getHeight() - imageSize) / 2;
+		} else {
+			xImageCoordinate = (int) ((practicePanelImageLabel.getWidth() - imageSize * correctAnswer)
+					/ (correctAnswer + 1));
+		}
+
+		// Create sub panels and draw all animal images
+		for (int i = 0; i < correctAnswer; i++) {
+			practicePanelSubImage[i] = new JLabel();
+			practicePanelSubImage[i].setOpaque(false);
+			practicePanelSubImage[i].setBounds(xImageCoordinate, yImageCoordinate, (int) imageSize, (int) imageSize);
+			xImageCoordinate += (int) ((practicePanelImageLabel.getWidth() - imageSize * correctAnswer)
+					/ (correctAnswer + 1)) + imageSize;
+			practicePanelImageLabel.add(practicePanelSubImage[i]);
+			practicePanelSubImage[i].setHorizontalAlignment(SwingConstants.CENTER);
+			practicePanelSubImage[i].setVerticalAlignment(SwingConstants.CENTER);
+
+			if (imageRatio > 1.0) {
+				imageWidth = practicePanelSubImage[i].getHeight();
+				imageHeight = (int) (practicePanelSubImage[i].getHeight() / imageRatio);
+			} else {
+				imageWidth = (int) (practicePanelSubImage[i].getHeight() * imageRatio);
+				imageHeight = practicePanelSubImage[i].getHeight();
+			}
+
+			Image questionImage = new ImageIcon(this.getClass().getResource(img)).getImage()
+					.getScaledInstance(imageWidth, imageHeight, java.awt.Image.SCALE_SMOOTH);
+			practicePanelSubImage[i].setIcon(new ImageIcon(questionImage));
+		}
+
+		// Create answer buttons
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel);
+	}
+
+	////////// QUESTION: GRADE K: CHOOSE NEXT NUMBER IN THE SEQUENCE //////////
+	public void createQuestionNextSequence(JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
+			JButton nextQuestion, JLabel practicePanelLabel) {
+
+		// Create new NextSequence object
+		NextSequence nextSequence = new NextSequence();
+		practicePanelTextLabel.setText(nextSequence.getQuestionText());
+		String[] answers = nextSequence.getAnswers();
+		int correctAnswerIndex = nextSequence.getCorrectAnswerIndex();
+		practicePanelImageLabel.setText(nextSequence.getSequence());
+		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 3));
+
+		// Create answer buttons
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel);
+	}
+
+	////////// CREATE ANSWER BUTTONS //////////
+	public void createAnswerButtons(String[] answers, JButton nextQuestion, int correctAnswerIndex,
+			JLabel practicePanelLabel) {
+
+		// Create answer selection Buttons
+		JButton[] answerSelectionButtons = new JButton[3];
+		int answerSelectionButtonXCoordinate = PRIMARY_RATIO * 4;
+
+		// Run loop 3 times (once per button). Create and draw buttons
+		for (int i = 0; i < 3; i++) {
+			answerSelectionButtons[i] = new JButton();
+			answerSelectionButtons[i].setText(String.valueOf(answers[i]));
+			answerSelectionButtons[i].setBackground(Color.BLUE);
+			answerSelectionButtons[i].setBounds(answerSelectionButtonXCoordinate,
+					practicePanelLabel.getHeight() + PRIMARY_RATIO, layeredPane.getWidth() / 5,
+					(layeredPane.getHeight() - PRIMARY_RATIO) - practicePanelLabel.getHeight());
+			answerSelectionButtonXCoordinate += layeredPane.getWidth() - PRIMARY_RATIO * 4
+					- (layeredPane.getWidth() / 5 * 3);
+			answerSelectionButtons[i]
+					.setFont(new Font("Calibri", Font.PLAIN, answerSelectionButtons[i].getHeight() / 2));
+			answerSelectionButtons[i].setForeground(Color.white);
+			answerSelectionButtons[i].setBorderPainted(true);
+			answerSelectionButtons[i].setBorder(raisedbevel);
+			answerSelectionButtons[i].setContentAreaFilled(false);
+			answerSelectionButtons[i].setFocusPainted(false);
+			answerSelectionButtons[i].setOpaque(true);
+			practicePanel.add(answerSelectionButtons[i]);
+
+			int j = i;
+
+			// When answer button is clicked, enable button for next question
+			answerSelectionButtons[i].addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+
+					nextQuestion.setEnabled(true);
+					nextQuestion.setBackground(new Color(GREEN_RGB[0], GREEN_RGB[1], GREEN_RGB[2]));
+
+					// If answer is right, highlight button in greed. Else, highlight red and reveal
+					// correct answer button
+					if (j == correctAnswerIndex) {
+						answerSelectionButtons[j].setBackground(Color.GREEN);
+					} else {
+						answerSelectionButtons[j].setBackground(Color.RED);
+						answerSelectionButtons[correctAnswerIndex].setBackground(Color.GREEN);
+					}
+				}
+			});
+
 		}
 	}
 
