@@ -137,7 +137,7 @@ public class Main {
 		headerPanel.setLayout(null);
 
 		// Header content title label
-		headerLabel = new JLabel("HOME");
+		headerLabel = new JLabel("CHOOSE YOUR GRADE");
 		headerLabel.setVerticalAlignment(SwingConstants.CENTER);
 		headerLabel.setHorizontalAlignment(SwingConstants.CENTER);
 		headerLabel.setFont(new Font("Calibri", Font.PLAIN, (headerPanel.getHeight() - PRIMARY_RATIO) / 3));
@@ -258,7 +258,7 @@ public class Main {
 		homePanel.setLayout(null);
 
 		panelList[panelCounter] = homePanel;
-		panelTitle[panelCounter] = "HOME";
+		panelTitle[panelCounter] = "CHOOSE YOUR GRADE";
 		headerLabel.setText(panelTitle[panelCounter]);
 
 		// Array for each home panel animal button
@@ -317,7 +317,7 @@ public class Main {
 
 					createGradePanel(gradeSelection);
 					panelList[++panelCounter] = gradePanel;
-					panelTitle[panelCounter] = "GRADE";
+					panelTitle[panelCounter] = "CHOOSE A TOPIC";
 					headerLabel.setText(panelTitle[panelCounter]);
 					switchPanel(gradePanel);
 
@@ -348,9 +348,19 @@ public class Main {
 				{ "ARITHMETIC", "FRACTIONS", "MEASURE", "GEOMETRY" } };
 
 		// [This will change. Insert grade images here]
-		String[] gradePanelImages = { "/countButton.png", "/addSubtractButton.png", "/compareButton.png",
-				"/shapesButton.png", "/happyChicken.png" };
-		double[] gradePanelImageRatios = { 0.94, 2.11, 1.49, 0.92, 0.62 };
+		String[][] gradePanelImages = {
+				{ "/countButton.png", "/addSubtractButton.png", "/compareButton.png", "/shapesButton.png",
+						"/happyChicken.png" },
+				{ "/addSubtractButton.png", "/timeMoneyButton.png", "/compareButton.png", "/shapesButton.png",
+						"/happyPig.png" },
+				{ "/addSubtractButton.png", "/timeMoneyButton.png", "/measureButton.png", "/shapesButton.png",
+						"/happySheep.png" },
+				{ "/arithmeticButton.png", "/fractionsButton.png", "/measureButton.png", "/shapesButton.png",
+						"/happyCow.png" },
+				{ "/arithmeticButton.png", "/fractionsButton.png", "/measureButton.png", "/shapesButton.png",
+						"/happyHorse.png" } };
+		double[][] gradePanelImageRatios = { { 0.94, 2.11, 1.49, 0.92, 0.62 }, { 2.11, 1.0, 1.49, 0.92, 0.86 },
+				{ 2.11, 1.0, 1.99, 0.92, 0.96 }, { 1.0, 0.74, 1.99, 0.92, 0.88 }, { 1.0, 0.74, 1.99, 0.92, 0.84 } };
 
 		int gradePanelButtonXCoordinate = 0;
 		int gradePanelButtonYCoordinate = 0;
@@ -371,14 +381,16 @@ public class Main {
 
 			// Draw image and print text on each button
 			Image gradePanelImage;
-			if (gradePanelImageRatios[i] < 1) {
-				gradePanelImage = new ImageIcon(this.getClass().getResource(gradePanelImages[i])).getImage()
-						.getScaledInstance((int) (PRIMARY_RATIO * 4 * gradePanelImageRatios[i]), PRIMARY_RATIO * 4,
-								java.awt.Image.SCALE_SMOOTH);
+			if (gradePanelImageRatios[gradeSelection][i] < 1) {
+				gradePanelImage = new ImageIcon(this.getClass().getResource(gradePanelImages[gradeSelection][i]))
+						.getImage()
+						.getScaledInstance((int) (PRIMARY_RATIO * 4 * gradePanelImageRatios[gradeSelection][i]),
+								PRIMARY_RATIO * 4, java.awt.Image.SCALE_SMOOTH);
 			} else {
-				gradePanelImage = new ImageIcon(this.getClass().getResource(gradePanelImages[i])).getImage()
-						.getScaledInstance((int) (PRIMARY_RATIO * 4),
-								(int) (PRIMARY_RATIO * 4 / gradePanelImageRatios[i]), java.awt.Image.SCALE_SMOOTH);
+				gradePanelImage = new ImageIcon(this.getClass().getResource(gradePanelImages[gradeSelection][i]))
+						.getImage().getScaledInstance((int) (PRIMARY_RATIO * 4),
+								(int) (PRIMARY_RATIO * 4 / gradePanelImageRatios[gradeSelection][i]),
+								java.awt.Image.SCALE_SMOOTH);
 			}
 
 			// Split button into image and text
@@ -415,7 +427,7 @@ public class Main {
 					int categorySelection = j;
 					createLearnPracticePanel(gradeSelection, categorySelection);
 					panelList[++panelCounter] = learnPracticePanel;
-					panelTitle[panelCounter] = "LEARN OR PRACTICE";
+					panelTitle[panelCounter] = "LEARN OR PRACTICE?";
 					headerLabel.setText(panelTitle[panelCounter]);
 					switchPanel(learnPracticePanel);
 
@@ -426,20 +438,37 @@ public class Main {
 
 		// Create button for Test
 		JButton testButton = new JButton();
-		int buttonHeight = layeredPane.getHeight() - PRIMARY_RATIO * 2;
 		createButton(testButton, gradePanelButtons[0].getWidth() + PRIMARY_RATIO, PRIMARY_RATIO,
 				layeredPane.getWidth() - gradePanelButtons[0].getWidth() * 2 - PRIMARY_RATIO * 2,
-				layeredPane.getHeight() - PRIMARY_RATIO * 2, GREEN_RGB, gradePanelImages[4],
-				(int) ((buttonHeight - PRIMARY_RATIO * 2) * gradePanelImageRatios[4]), buttonHeight - PRIMARY_RATIO * 2,
-				true);
+				layeredPane.getHeight() - PRIMARY_RATIO * 2, GREEN_RGB, "", 1, 1, true);
 		gradePanel.add(testButton);
+
+		// Split button into image and text
+		JLabel testImage = new JLabel();
+		JLabel testText = new JLabel();
+		testButton.setLayout(null);
+		testButton.add(testImage);
+		testButton.add(testText);
+		testImage.setBounds(0, 0, testButton.getWidth(), testButton.getHeight() / 4 * 3);
+		testText.setBounds(0, testButton.getHeight() / 4 * 3, testButton.getWidth(), testButton.getHeight() / 4);
+		Image testAnimalImage = new ImageIcon(this.getClass().getResource(gradePanelImages[gradeSelection][4]))
+				.getImage().getScaledInstance(
+						(int) ((testImage.getHeight() - PRIMARY_RATIO) * gradePanelImageRatios[gradeSelection][4]),
+						testImage.getHeight() - PRIMARY_RATIO, java.awt.Image.SCALE_SMOOTH);
+
+		// Place the image and text on the label
+		testImage.setIcon(new ImageIcon(testAnimalImage));
+		testImage.setHorizontalAlignment(SwingConstants.CENTER);
+		testText.setFont(new Font("Calibri", Font.PLAIN, (testButton.getHeight() / 10)));
+		testText.setText("TEST");
+		testText.setHorizontalAlignment(SwingConstants.CENTER);
 
 		// Action Listener for Test button
 		testButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				createTestPanel(gradeSelection);
 				panelList[++panelCounter] = testPanel;
-				panelTitle[panelCounter] = "TEST";
+				panelTitle[panelCounter] = "TIME FOR A TEST!";
 				headerLabel.setText(panelTitle[panelCounter]);
 				switchPanel(testPanel);
 			}
@@ -456,8 +485,10 @@ public class Main {
 
 		// Arrays for the Learn/Practice buttons, images, and ratios
 		JButton[] learnPracticeButtons = new JButton[2];
-		String[][] learnPracticeImages = { { "/learnChicken.png", "/practiceChicken.png" } };
-		double[][] learnPracticeImageRatios = { { 0.7, 0.61 } };
+		String[][] learnPracticeImages = { { "/learnChicken.png", "/practiceChicken.png" },
+				{ "/learnPig.png", "/practicePig.png" }, { "/learnSheep.png", "/practiceSheep.png" },
+				{ "/learnCow.png", "/practiceCow.png" }, { "/learnHorse.png", "/practiceHorse.png" } };
+		double[][] learnPracticeImageRatios = { { 0.7, 0.61 }, { 1, 0.85 }, { 1, 0.97 }, { 1, 0.84 }, { 1, 0.82 } };
 		String[] learnPracticePanelText = { "LEARN", "PRACTICE" };
 
 		// Starting x coordinate for Learn button
@@ -508,7 +539,7 @@ public class Main {
 			public void actionPerformed(ActionEvent e) {
 				createLearnPanel(gradeSelection);
 				panelList[++panelCounter] = learnPanel;
-				panelTitle[panelCounter] = "LEARN";
+				panelTitle[panelCounter] = "CHOOSE A VIDEO";
 				headerLabel.setText(panelTitle[panelCounter]);
 				switchPanel(learnPanel);
 			}
@@ -519,7 +550,7 @@ public class Main {
 			public void actionPerformed(ActionEvent e) {
 				createActivityPanel(gradeSelection, categorySelection);
 				panelList[++panelCounter] = activityPanel;
-				panelTitle[panelCounter] = "PRACTICE";
+				panelTitle[panelCounter] = "CHOOSE AN ACTIVITY";
 				headerLabel.setText(panelTitle[panelCounter]);
 				switchPanel(activityPanel);
 			}
@@ -744,7 +775,7 @@ public class Main {
 
 					createPracticePanel(gradeSelection, categorySelection, activitySelection);
 					panelList[++panelCounter] = practicePanel;
-					panelTitle[panelCounter] = "LEARN";
+					panelTitle[panelCounter] = "TIME TO PRACTICE!";
 					headerLabel.setText(panelTitle[panelCounter]);
 					switchPanel(practicePanel);
 				}
