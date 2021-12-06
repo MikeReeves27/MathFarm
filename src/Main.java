@@ -701,14 +701,17 @@ public class Main {
 		activityPanel.setBackground(new Color(0, 0, 0, 0));
 		activityPanel.setLayout(null);
 
-		String[][][] activityImages = { { { "/howMany.png", "/nextSequence.png" },
-				{ "/plusSign.png", "/minusSign.png" }, { "/compare.png" }, { "/shapes.png" } },
-				{ {}, { "/clock100.png" } }, { {}, { "/calendar.png" } } };
+		String[][][] activityImages = {
+				{ { "/howMany.png", "/nextSequence.png" }, { "/plusSign.png", "/minusSign.png" }, { "/compare.png" },
+						{ "/shapes.png" } },
+				{ {}, { "/clock100.png" } }, { {}, { "/calendar.png" } }, { {}, { "/pizza23.png" } },
+				{ {}, { "/fractionEquivalences.png" } } };
 		double[][][] activityImageRatios = { { { 0.93, 3.92 }, { 1.0, 2.0 }, { 0.62 }, { 0.93 } }, { {}, { 1.0 } },
-				{ {}, { 1.18 } } };
+				{ {}, { 1.18 } }, { {}, { 1.0 } }, { {}, { 1.48 } } };
 		String[][][] activityText = {
 				{ { "HOW MANY", "WHAT'S NEXT" }, { "ADD", "SUBTRACT" }, { "COMPARE" }, { "NAME THE SHAPE" } },
-				{ {}, { "WHAT TIME" } }, { {}, { "HOW MUCH TIME" } } };
+				{ {}, { "WHAT TIME" } }, { {}, { "HOW MUCH TIME" } }, { {}, { "PIZZA FRACTIONS" } },
+				{ {}, { "FRACTIONS" } } };
 
 		JButton[] activityButtons = new JButton[activityImages[gradeSelection][categorySelection].length];
 
@@ -979,6 +982,32 @@ public class Main {
 				break;
 			}
 			break;
+
+		// Grade 3:
+		case 3:
+			// Switch for category selection
+			switch (categorySelection) {
+
+			// Grade 3: Fractions
+			case 1:
+				createQuestionFractions(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+						practicePanelLabel, practiceOrTestPanel);
+				break;
+			}
+			break;
+
+		// Grade 3:
+		case 4:
+			// Switch for category selection
+			switch (categorySelection) {
+
+			// Grade 4: Fraction Equivalences
+			case 1:
+				createQuestionFractionEquivalences(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+						practicePanelLabel, practiceOrTestPanel);
+				break;
+			}
+			break;
 		}
 	}
 
@@ -1138,10 +1167,39 @@ public class Main {
 	public void createQuestionHowMuchTime(JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
 			JButton nextQuestion, JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
 		HowMuchTime howMuchTime = new HowMuchTime();
-		// practicePanelTextLabel.setText(howMuchTime.getQuestionText());
 		String[] answers = howMuchTime.getAnswers();
 		int correctAnswerIndex = howMuchTime.getCorrectAnswerIndex();
 		practicePanelImageLabel.setText(howMuchTime.getQuestionText());
+		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 4));
+
+		// Create answer buttons
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
+	}
+
+	////////// QUESTION: GRADE 3: FRACTIONS //////////
+	public void createQuestionFractions(JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
+			JButton nextQuestion, JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
+		Fractions fractions = new Fractions();
+		practicePanelTextLabel.setText(fractions.getQuestionText());
+		String[] answers = fractions.getAnswers();
+		int correctAnswerIndex = fractions.getCorrectAnswerIndex();
+		String img = fractions.getImage();
+		Image questionImage = new ImageIcon(this.getClass().getResource(img)).getImage().getScaledInstance(
+				practicePanelImageLabel.getHeight(), practicePanelImageLabel.getHeight(), java.awt.Image.SCALE_SMOOTH);
+		practicePanelImageLabel.setIcon(new ImageIcon(questionImage));
+
+		// Create answer buttons
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
+	}
+
+	////////// QUESTION: GRADE 4: FRACTIONS //////////
+	public void createQuestionFractionEquivalences(JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
+			JButton nextQuestion, JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
+		FractionEquivalences fractionEquivalences = new FractionEquivalences();
+		practicePanelTextLabel.setText(fractionEquivalences.getQuestionText());
+		String[] answers = fractionEquivalences.getAnswers();
+		int correctAnswerIndex = fractionEquivalences.getCorrectAnswerIndex();
+		practicePanelImageLabel.setText(fractionEquivalences.getImage());
 		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 4));
 
 		// Create answer buttons
