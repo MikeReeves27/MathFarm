@@ -702,10 +702,13 @@ public class Main {
 		activityPanel.setLayout(null);
 
 		String[][][] activityImages = { { { "/howMany.png", "/nextSequence.png" },
-				{ "/plusSign.png", "/minusSign.png" }, { "/compare.png" }, { "/shapes.png" } } };
-		double[][][] activityImageRatios = { { { 0.93, 3.92 }, { 1.0, 2.0 }, { 0.62 }, { 0.93 } } };
+				{ "/plusSign.png", "/minusSign.png" }, { "/compare.png" }, { "/shapes.png" } },
+				{ {}, { "/clock100.png" } }, { {}, { "/calendar.png" } } };
+		double[][][] activityImageRatios = { { { 0.93, 3.92 }, { 1.0, 2.0 }, { 0.62 }, { 0.93 } }, { {}, { 1.0 } },
+				{ {}, { 1.18 } } };
 		String[][][] activityText = {
-				{ { "HOW MANY", "WHAT'S NEXT" }, { "ADD", "SUBTRACT" }, { "IS IT EQUAL" }, { "NAME THE SHAPE" } } };
+				{ { "HOW MANY", "WHAT'S NEXT" }, { "ADD", "SUBTRACT" }, { "COMPARE" }, { "NAME THE SHAPE" } },
+				{ {}, { "WHAT TIME" } }, { {}, { "HOW MUCH TIME" } } };
 
 		JButton[] activityButtons = new JButton[activityImages[gradeSelection][categorySelection].length];
 
@@ -892,7 +895,8 @@ public class Main {
 
 			// Grade K: Count
 			case 0:
-				// int activity = rand.nextInt(2);
+
+				// Switch for activity selection
 				switch (activitySelection) {
 
 				// Grade K: Count: How many
@@ -908,53 +912,74 @@ public class Main {
 					break;
 				}
 				break;
+
+			// Grade K: Addition/Subtraction
 			case 1:
 
+				// Switch for activity selection
 				switch (activitySelection) {
+
+				// Grade K: Addition/Subtraction: Addition
 				case 0:
 					createAdditionQuestions(gradeSelection, 1, practicePanelImageLabel, practicePanelTextLabel,
 							nextQuestion, practicePanelLabel, practiceOrTestPanel);
 					break;
 
+				// Grade K: Addition/Subtraction: Subtraction
 				case 1:
 					createAdditionQuestions(gradeSelection, 2, practicePanelImageLabel, practicePanelTextLabel,
 							nextQuestion, practicePanelLabel, practiceOrTestPanel);
 					break;
 				}
 				break;
+
+			// Grade K: Compare
 			case 2:
+
+				// Grade K: Compare: Compare
 				createQuestionCompare(practicePanelImageLabel, practicePanelTextLabel, nextQuestion, practicePanelLabel,
 						practiceOrTestPanel);
 				break;
 
-			case 3: // Grade K: Shapes
+			// Grade K: Shapes
+			case 3:
+
+				// Grade K: Shapes: What Shape
 				createQuestionShapes(practicePanelImageLabel, practicePanelTextLabel, nextQuestion, practicePanelLabel,
 						practiceOrTestPanel);
 
+				break;
+
 			}
+			break;
+
+		// Grade 1:
+		case 1:
+
+			// Switch for category selection
+			switch (categorySelection) {
+
+			// Grade 1: Time and Money
+			case 1:
+				createQuestionWhatTime(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+						practicePanelLabel, practiceOrTestPanel);
+				break;
+			}
+			break;
+
+		// Grade 2:
+		case 2:
+			// Switch for category selection
+			switch (categorySelection) {
+
+			// Grade 2: Time and Money
+			case 1:
+				createQuestionHowMuchTime(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+						practicePanelLabel, practiceOrTestPanel);
+				break;
+			}
+			break;
 		}
-	}
-
-	////////// QUESTION: GRADE K: ADDITION //////////
-	public void createAdditionQuestions(int gradeSelection, int operation, JLabel practicePanelImageLabel,
-			JLabel practicePanelTextLabel, JButton nextQuestion, JLabel practicePanelLabel,
-			JPanel practiceOrTestPanel) {
-
-		// Create new ADDITION OR SUBTRACTION object
-		Arithmetic arithmetic = new Arithmetic(gradeSelection, operation);
-		practicePanelTextLabel.setText(arithmetic.getQuestionText());
-		String[] answers = arithmetic.getAnswers();
-		String[] questions = arithmetic.getQuestions();
-		int correctAnswerIndex = arithmetic.getCorrectAnswerIndex();
-
-		practicePanelImageLabel.setVisible(true);
-
-		String question = questions[0] + "  " + questions[1] + "  " + questions[2];
-		practicePanelImageLabel.setText(question);
-		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 2));
-
-		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
 	}
 
 	////////// QUESTION: GRADE K: CHOOSE HOW MANY ANIMALS THERE ARE //////////
@@ -1033,6 +1058,28 @@ public class Main {
 		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
 	}
 
+	////////// QUESTION: GRADE K: ADDITION //////////
+	public void createAdditionQuestions(int gradeSelection, int operation, JLabel practicePanelImageLabel,
+			JLabel practicePanelTextLabel, JButton nextQuestion, JLabel practicePanelLabel,
+			JPanel practiceOrTestPanel) {
+
+		// Create new ADDITION OR SUBTRACTION object
+		Arithmetic arithmetic = new Arithmetic(gradeSelection, operation);
+		practicePanelTextLabel.setText(arithmetic.getQuestionText());
+		String[] answers = arithmetic.getAnswers();
+		String[] questions = arithmetic.getQuestions();
+		int correctAnswerIndex = arithmetic.getCorrectAnswerIndex();
+
+		practicePanelImageLabel.setVisible(true);
+
+		String question = questions[0] + "  " + questions[1] + "  " + questions[2];
+		practicePanelImageLabel.setText(question);
+		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 2));
+
+		// Create answer buttons
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
+	}
+
 	////////// QUESTION: GRADE K: Compare two numbers //////////
 	public void createQuestionCompare(JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
 			JButton nextQuestion, JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
@@ -1069,6 +1116,36 @@ public class Main {
 		// Create answer buttons
 		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
 
+	}
+
+	////////// QUESTION: GRADE 1: WHAT TIME IS IT //////////
+	public void createQuestionWhatTime(JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
+			JButton nextQuestion, JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
+		WhatTime whatTime = new WhatTime();
+		practicePanelTextLabel.setText(whatTime.getQuestionText());
+		String[] answers = whatTime.getAnswers();
+		int correctAnswerIndex = whatTime.getCorrectAnswerIndex();
+		String img = whatTime.getImage();
+		Image questionImage = new ImageIcon(this.getClass().getResource(img)).getImage().getScaledInstance(
+				practicePanelImageLabel.getHeight(), practicePanelImageLabel.getHeight(), java.awt.Image.SCALE_SMOOTH);
+		practicePanelImageLabel.setIcon(new ImageIcon(questionImage));
+
+		// Create answer buttons
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
+	}
+
+	////////// QUESTION: GRADE 2: HOW MUCH TIME //////////
+	public void createQuestionHowMuchTime(JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
+			JButton nextQuestion, JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
+		HowMuchTime howMuchTime = new HowMuchTime();
+		// practicePanelTextLabel.setText(howMuchTime.getQuestionText());
+		String[] answers = howMuchTime.getAnswers();
+		int correctAnswerIndex = howMuchTime.getCorrectAnswerIndex();
+		practicePanelImageLabel.setText(howMuchTime.getQuestionText());
+		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 4));
+
+		// Create answer buttons
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
 	}
 
 	////////// CREATE ANSWER BUTTONS //////////
