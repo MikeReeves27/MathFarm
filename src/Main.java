@@ -1,38 +1,45 @@
 
-/** 
- * MATH FARM
- * By Michael Reeves, Mukil Selvaraju, Jonathan Duquette
-*/
+/***
+ *   APPLICATION NAME: 	MATH FARM
+ * 			TEAM NAME: 	3 MUSKETEERS
+ * 		 TEAM MEMBERS: 	JONATHAN DUQUETTE, MICHAEL REEVES, MUKILARASI SELVARAJU
+ * 			 SEMESTER:	FALL SEMESTER, 2021
+ * 			   COURSE: 	CSCI 362 - SOFTWARE ENGINEERING
+ * 			PROFESSOR:	MARK MORABITO
+ * 		 INSTITUTION:	FRAMINGHAM STATE UNIVERSITY
+***/
 
 import java.awt.CardLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Random;
 
 import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
 
 public class Main {
 
 	private JFrame frame;
 	private JPanel headerPanel;
 	private JLayeredPane layeredPane;
+	private JPanel badgePanel;
 	private JPanel homePanel;
 	private JPanel gradePanel;
 	private JPanel learnPracticePanel;
@@ -55,6 +62,9 @@ public class Main {
 	private JPanel[] panelList = new JPanel[10];
 	private String[] panelTitle = new String[10];
 	private int panelCounter = 0;
+
+	// Global array for tracking if badges are unlocked;
+	private boolean[] badgeUnlocked = new boolean[5];
 
 	// Global array for clickable button RGB values
 	private int[] GREEN_RGB = { 146, 208, 80 };
@@ -214,6 +224,44 @@ public class Main {
 			}
 		});
 
+		// Badge button
+		JButton badgeButton = new JButton();
+		headerPanel.add(badgeButton);
+
+		// Set button height/width to headerPanel height
+		createButton(badgeButton, headerPanel.getWidth() / 4 * 3 + PRIMARY_RATIO, 0,
+				headerPanel.getHeight() - PRIMARY_RATIO, headerPanel.getHeight() - PRIMARY_RATIO, SKY_RGB,
+				"/badgesButton.png", headerPanel.getHeight() - PRIMARY_RATIO, headerPanel.getHeight() - PRIMARY_RATIO,
+				false);
+
+		// Set text below Badge button
+		JLabel badgeText = new JLabel();
+		headerPanel.add(badgeText);
+		badgeText.setBounds(headerPanel.getWidth() / 4 * 3 + PRIMARY_RATIO, headerPanel.getHeight() - PRIMARY_RATIO,
+				headerPanel.getHeight() - PRIMARY_RATIO, PRIMARY_RATIO * 3 / 2);
+		badgeText.setFont(new Font("Calibri", Font.PLAIN, (int) PRIMARY_RATIO / 8 * 7));
+		badgeText.setText("BADGES");
+		badgeText.setHorizontalAlignment(SwingConstants.CENTER);
+		badgeText.setVerticalAlignment(SwingConstants.CENTER);
+
+		// When clicked, return to previous panel
+		badgeButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+
+				createBadgePanel();
+				panelCounter = 0;
+				panelList[++panelCounter] = badgePanel;
+				panelTitle[panelCounter] = "YOUR BADGES";
+				headerLabel.setText(panelTitle[panelCounter]);
+				switchPanel(badgePanel);
+
+				// Rest test score and counter
+				testScore = 0;
+				testCounter = 0;
+
+			}
+		});
+
 		// LogOut Button
 		JButton logOutButton = new JButton();
 		headerPanel.add(logOutButton);
@@ -246,6 +294,51 @@ public class Main {
 
 			}
 		});
+
+	}
+
+	////////// BADGE SCREEN //////////
+	public void createBadgePanel() {
+
+		badgePanel = new JPanel();
+		layeredPane.add(badgePanel);
+		badgePanel.setBackground(new Color(0, 0, 0, 0));
+		badgePanel.setLayout(null);
+
+		// Starting x coordinate for first badge
+		int badgePanelXCoordinate = 0;
+
+		// Image file names for unlocked badges
+		String[] badgeList = { "/badgeChicken.png", "/badgePig.png", "/badgeSheep.png", "/badgeCow.png",
+				"/badgeHorse.png" };
+		JLabel badgeLabel;
+
+		// Run label for each badge
+		for (int i = 0; i < 5; i++) {
+
+			badgeLabel = new JLabel("");
+			Image badgeImage;
+
+			int badgeSize = (layeredPane.getWidth() - PRIMARY_RATIO * 2) / 5;
+
+			// If the badge has been unlocked by user, display golden badge. Otherwise,
+			// display blank badge
+			if (badgeUnlocked[i] == true) {
+				badgeImage = new ImageIcon(this.getClass().getResource(badgeList[i])).getImage()
+						.getScaledInstance(badgeSize, badgeSize, java.awt.Image.SCALE_SMOOTH);
+			} else {
+				badgeImage = new ImageIcon(this.getClass().getResource("/badge.png")).getImage()
+						.getScaledInstance(badgeSize, badgeSize, java.awt.Image.SCALE_SMOOTH);
+			}
+
+			badgeLabel.setBounds(badgePanelXCoordinate, layeredPane.getHeight() / 2 - PRIMARY_RATIO * 3, badgeSize,
+					badgeSize);
+			badgeLabel.setIcon(new ImageIcon(badgeImage));
+			badgePanel.add(badgeLabel);
+
+			badgePanelXCoordinate += PRIMARY_RATIO / 2 + badgeSize;
+
+		}
 
 	}
 
@@ -319,6 +412,7 @@ public class Main {
 					panelList[++panelCounter] = gradePanel;
 					panelTitle[panelCounter] = "CHOOSE A TOPIC";
 					headerLabel.setText(panelTitle[panelCounter]);
+					homePanelButtons[j].setBackground(new Color(GREEN_RGB[0], GREEN_RGB[1], GREEN_RGB[2]));
 					switchPanel(gradePanel);
 
 				}
@@ -339,7 +433,7 @@ public class Main {
 		JButton[] gradePanelButtons = new JButton[5];
 
 		// Array for all grade categories
-		String[][] categories = { { "COUNT", "<html><center>ADD & <br>SUBTRACT</html>", "COMPARE", "SHAPES" },
+		String[][] categories = { { "<html><center>ADD & <br>SUBTRACT</html>", "COUNT", "COMPARE", "SHAPES" },
 				{ "<html><center>ADD & <br>SUBTRACT</html>", "<html><center>TIME & <br>MONEY</html>", "COMPARE",
 						"SHAPES" },
 				{ "<html><center>ADD & <br>SUBTRACT</html>", "<html><center>TIME & <br>MONEY</html>", "MEASURE",
@@ -349,7 +443,7 @@ public class Main {
 
 		// [This will change. Insert grade images here]
 		String[][] gradePanelImages = {
-				{ "/countButton.png", "/addSubtractButton.png", "/compareButton.png", "/shapesButton.png",
+				{ "/addSubtractButton.png", "/countButton.png", "/compareButton.png", "/shapesButton.png",
 						"/happyChicken.png" },
 				{ "/addSubtractButton.png", "/timeMoneyButton.png", "/compareButton.png", "/shapesButton.png",
 						"/happyPig.png" },
@@ -359,7 +453,7 @@ public class Main {
 						"/happyCow.png" },
 				{ "/arithmeticButton.png", "/fractionsButton.png", "/measureButton.png", "/shapesButton.png",
 						"/happyHorse.png" } };
-		double[][] gradePanelImageRatios = { { 0.94, 2.11, 1.49, 0.92, 0.62 }, { 2.11, 1.0, 1.49, 0.92, 0.86 },
+		double[][] gradePanelImageRatios = { { 2.11, 0.94, 1.49, 0.92, 0.62 }, { 2.11, 1.0, 1.49, 0.92, 0.86 },
 				{ 2.11, 1.0, 1.99, 0.92, 0.96 }, { 1.0, 0.74, 1.99, 0.92, 0.88 }, { 1.0, 0.74, 1.99, 0.92, 0.84 } };
 
 		int gradePanelButtonXCoordinate = 0;
@@ -429,6 +523,7 @@ public class Main {
 					panelList[++panelCounter] = learnPracticePanel;
 					panelTitle[panelCounter] = "LEARN OR PRACTICE?";
 					headerLabel.setText(panelTitle[panelCounter]);
+					gradePanelButtons[j].setBackground(new Color(GREEN_RGB[0], GREEN_RGB[1], GREEN_RGB[2]));
 					switchPanel(learnPracticePanel);
 
 				}
@@ -470,6 +565,7 @@ public class Main {
 				panelList[++panelCounter] = testPanel;
 				panelTitle[panelCounter] = "TIME FOR A TEST!";
 				headerLabel.setText(panelTitle[panelCounter]);
+				testButton.setBackground(new Color(GREEN_RGB[0], GREEN_RGB[1], GREEN_RGB[2]));
 				switchPanel(testPanel);
 			}
 		});
@@ -537,10 +633,11 @@ public class Main {
 		// Action Listener for Learn button
 		learnPracticeButtons[0].addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				createLearnPanel(gradeSelection);
+				createLearnPanel(gradeSelection, categorySelection);
 				panelList[++panelCounter] = learnPanel;
 				panelTitle[panelCounter] = "CHOOSE A VIDEO";
 				headerLabel.setText(panelTitle[panelCounter]);
+				learnPracticeButtons[0].setBackground(new Color(GREEN_RGB[0], GREEN_RGB[1], GREEN_RGB[2]));
 				switchPanel(learnPanel);
 			}
 		});
@@ -552,6 +649,7 @@ public class Main {
 				panelList[++panelCounter] = activityPanel;
 				panelTitle[panelCounter] = "CHOOSE AN ACTIVITY";
 				headerLabel.setText(panelTitle[panelCounter]);
+				learnPracticeButtons[1].setBackground(new Color(GREEN_RGB[0], GREEN_RGB[1], GREEN_RGB[2]));
 				switchPanel(activityPanel);
 			}
 		});
@@ -564,9 +662,6 @@ public class Main {
 		layeredPane.add(testPanel, "name_180577775611500");
 		testPanel.setBackground(new Color(0, 0, 0, 0));
 		testPanel.setLayout(null);
-
-		// Update headerLabel text
-		headerLabel.setText("TEST");
 
 		// Set test panel width and height
 		int panelWidth = layeredPane.getWidth() - PRIMARY_RATIO * 8;
@@ -636,59 +731,113 @@ public class Main {
 			// If test is over, display result
 		} else {
 			testPanelImageLabel.setText(testScore + " / 10");
+
+			// If user scores successful score, unlocked grade's badge
+			if (testScore > 7) {
+				badgeUnlocked[gradeSelection] = true;
+			}
 		}
 
 	}
 
 	////////// LEARN PANEL //////////
-	public void createLearnPanel(int grade) {
+	public void createLearnPanel(int gradeSelection, int categorySelection) {
 		learnPanel = new JPanel(new GridLayout());
 		layeredPane.add(learnPanel, "name_180577775611500");
 		learnPanel.setBackground(new Color(0, 0, 0, 0));
 		learnPanel.setLayout(null);
 
-		// Update headerLabel text
-		headerLabel.setText("LEARN");
+		// Set practice panel width and height
+		int panelWidth = layeredPane.getWidth() - PRIMARY_RATIO * 8;
+		int panelHeight = layeredPane.getHeight() - PRIMARY_RATIO * 4;
 
-		// Learn links list
-		DefaultListModel<String> dlm = new DefaultListModel<>();
-		JList<String> gradeKLearnLinks = new JList<>(dlm);
-		gradeKLearnLinks.addListSelectionListener(new ListSelectionListener() {
-			public void valueChanged(ListSelectionEvent e) {
-				@SuppressWarnings("unchecked")
-				JList<String> list = (JList<String>) e.getSource();
-				if (!e.getValueIsAdjusting()) {
-					int index = list.getSelectedIndex();
-					if (index != -1) {
-						String address = list.getSelectedValue();
-						Browser.openWebpage(address);
-					}
-				}
-			}
-		});
+		// Create main background label for practice panel
+		JLabel learnLabel = new JLabel();
+		learnLabel.setBackground(new Color(DARK_GREEN_RGB[0], DARK_GREEN_RGB[1], DARK_GREEN_RGB[2]));
+		learnLabel.setBounds(PRIMARY_RATIO * 4, 0, panelWidth, panelHeight);
+		learnPanel.add(learnLabel);
+		learnLabel.setOpaque(true);
+		learnLabel.setBorder(raisedbevel);
 
-		gradeKLearnLinks.setBounds(105, 0, 1000, 350);
-		// JScrollPane jsp = new JScrollPane(gradeKLearnLinks);
-		// jsp.setPreferredSize(new Dimension(1000,800));
-		learnPanel.add(gradeKLearnLinks);
-		// learnPanel.add(jsp);
-		gradeKLearnLinks.setBorder(raisedbevel);
-		gradeKLearnLinks.setOpaque(true);
-		gradeKLearnLinks.setBackground(new Color(145, 210, 80));
+		String[][][] hyperlinks = { {
+
+				{ "https://www.youtube.com/watch?v=mjlsSYLLOSE&t=53s", "https://www.youtube.com/watch?v=rqiu_xcvSk4" },
+				{ "https://www.youtube.com/watch?v=x6D51-pz2A4", "https://www.youtube.com/watch?v=2X6FSDrWDEo",
+						"https://www.youtube.com/watch?v=UsbZ-1VmNvw", "https://www.youtube.com/watch?v=dihlSqall3k" },
+				{ "https://www.youtube.com/watch?v=ka9zbPcqXBI" },
+				{ "https://www.youtube.com/watch?v=1VBW6rdvRks", "https://www.youtube.com/watch?v=uaUnTxoF4hU",
+						"https://www.youtube.com/watch?v=teif6M9FjHE" } },
+				{ { "https://www.youtube.com/watch?v=bGetqbqDVaA", "https://www.youtube.com/watch?v=3iQqmmG8wQQ" },
+						{ "https://www.youtube.com/watch?v=xdR7s8mwyp8", "https://www.youtube.com/watch?v=9p_Ca_Yb0zQ",
+								"https://www.youtube.com/watch?v=pnXJGNo08v0",
+								"https://www.youtube.com/watch?v=djwclHApLFo" },
+						{ "COMPARE" }, { "SHAPES" } },
+				{ { "ADD SUBTRACT" }, { "TIME MONEY" }, { "MEASURE" },
+						{ "https://www.youtube.com/watch?v=w27TpLQexbc",
+								"https://www.youtube.com/watch?v=guNdJ5MtX1A" } },
+				{ { "https://www.youtube.com/watch?v=IwW0GJWKH98" },
+						{ "https://www.youtube.com/watch?v=p33BYf1NDAE", "https://www.youtube.com/watch?v=KlfxIbO-KJs",
+								"https://www.youtube.com/watch?v=SZaXtOHNh6s" },
+						{ "MEASURE" }, { "GEOMETRY" } },
+				{ { "ARITHMETIC" }, { "FRACTIONS" }, { "MEASURE" }, { "GEOMETRY" } } };
+
+		String[][][] videoName = {
+				{ { "Basic Math Addition", "Subtractions for kids" },
+						{ "Count 1 to 10", "What Number is Missing", "Farm Animal Counting",
+								"Learn to count with Number Farm" },
+						{ "The Greater Than Less Than Song" },
+						{ "Learn Shapes With Wooden Toy Truck", "Shape Song", "Learn Shapes for Kids" } },
+				{ { "Big Numbers Song", "Even and Odd Numbers for Kids" },
+						{ "Easy Time", "Telling the Time for Kids", "The Money Song", "Money & Making Change" },
+						{ "COMPARE" }, { "SHAPES" } },
+				{ { "ADD SUBTRACT" }, { "TIME MONEY" }, { "MEASURE" }, { "Learn About 3D Shapes", "3D Shapes Song" } },
+				{ { "What is Arithmetic?" },
+						{ "Fractions for Kids", "Equivalent Fractions", "Fractions on a Number Line Song" },
+						{ "MEASURE" }, { "GEOMETRY" } },
+				{ { "ARITHMETIC" }, { "FRACTIONS" }, { "MEASURE" }, { "GEOMETRY" } } };
 
 		// Creating Hyper links
-		String[] hyperlinks = { "https://www.youtube.com/watch?v=mvOkMYCygps&ab_channel=KhanAcademy",
-				"https://www.youtube.com/watch?v=MTzTqvzWzm8&ab_channel=KhanAcademy",
-				"https://www.youtube.com/watch?v=i6sbjtJjJ-A&ab_channel=TheOrganicChemistryTutor",
-				"https://www.youtube.com/watch?v=sOE8Slo3Pqw&ab_channel=ScienceandMathsbyPrimroseKitten",
-				"https://www.youtube.com/watch?v=Vuj5CZDy-Pc&ab_channel=MathandScience" };
-		JLabel[] labels = new JLabel[hyperlinks.length];
+//		String[] hyperlinks = { "https://www.youtube.com/watch?v=mvOkMYCygps&ab_channel=KhanAcademy",
+//				"https://www.youtube.com/watch?v=MTzTqvzWzm8&ab_channel=KhanAcademy",
+//				"https://www.youtube.com/watch?v=i6sbjtJjJ-A&ab_channel=TheOrganicChemistryTutor",
+//				"https://www.youtube.com/watch?v=sOE8Slo3Pqw&ab_channel=ScienceandMathsbyPrimroseKitten" };
+		// "https://www.youtube.com/watch?v=Vuj5CZDy-Pc&ab_channel=MathandScience" };
 
-		for (int i = 0; i < hyperlinks.length; i++) {
-			labels[i] = new JLabel(hyperlinks[i]);
-			labels[i].setBackground(Color.BLUE);
+		int linkButtonHeight = learnLabel.getHeight() / 5;
+		int linkButtonYCoordinate = linkButtonHeight / 5;
 
-			dlm.addElement(hyperlinks[i]);
+		for (int i = 0; i < hyperlinks[gradeSelection][categorySelection].length; i++) {
+			JButton linkButton = new JButton();
+			createButton(linkButton, linkButtonHeight / 5, linkButtonYCoordinate,
+					learnLabel.getWidth() - linkButtonHeight / 5 * 2, linkButtonHeight, GREEN_RGB, "", 1, 1, true);
+			learnLabel.add(linkButton);
+			linkButton.setText("\u2022 " + videoName[gradeSelection][categorySelection][i]);
+			linkButton.setHorizontalAlignment(SwingConstants.LEFT);
+			linkButton.setFont(new Font("Calibri", Font.PLAIN, linkButtonHeight / 2));
+
+			linkButtonYCoordinate += linkButtonHeight + linkButtonHeight / 5;
+
+			int j = i;
+			try {
+				linkButton.addActionListener(new ActionListener() {
+
+					URI uri = new URI(hyperlinks[gradeSelection][categorySelection][j]);
+
+					public void actionPerformed(ActionEvent e) {
+
+						if (Desktop.isDesktopSupported()) {
+							Desktop desktop = Desktop.getDesktop();
+							try {
+								desktop.browse(uri);
+							} catch (Exception ex) {
+							}
+						}
+
+					}
+				});
+			} catch (URISyntaxException e1) {
+				e1.printStackTrace();
+			}
 		}
 
 		learnPanel.setVisible(true);
@@ -702,16 +851,24 @@ public class Main {
 		activityPanel.setLayout(null);
 
 		String[][][] activityImages = {
-				{ { "/howMany.png", "/nextSequence.png" }, { "/plusSign.png", "/minusSign.png" }, { "/compare.png" },
+				{ { "/plusSign.png", "/minusSign.png" }, { "/howMany.png", "/nextSequence.png" }, { "/compare.png" },
 						{ "/shapes.png" } },
-				{ {}, { "/clock100.png" } }, { {}, { "/calendar.png" } }, { {}, { "/pizza23.png" } },
-				{ {}, { "/fractionEquivalences.png" } } };
-		double[][][] activityImageRatios = { { { 0.93, 3.92 }, { 1.0, 2.0 }, { 0.62 }, { 0.93 } }, { {}, { 1.0 } },
-				{ {}, { 1.18 } }, { {}, { 1.0 } }, { {}, { 1.48 } } };
+				{ { "/plusSign.png", "/minusSign.png" }, { "/clock100.png" }, { /* COMPARE */ }, { "/shapes.png" } },
+				{ { "/plusSign.png", "/minusSign.png" }, { "/calendar.png" }, { /* MEASURE */ }, { /* GEOMETRY */ } },
+				{ { /* MULTIPLY */, /* DIVIDE */ }, { "/pizza23.png" }, { /* MEASURE */ }, { /* GEOMETRY */ } },
+				{ { /* MULTIPLY */, /* DIVIDE */ }, { "/fractionEquivalences.png" }, { /* MEASURE */ },
+						{ /* GEOMETRY */ } } };
+		double[][][] activityImageRatios = { { { 1.0, 2.0 }, { 0.93, 3.92 }, { 0.62 }, { 0.93 } },
+				{ { 1.0, 2.0 }, { 1.0 }, { /* COMPARE */ }, { 0.93 } },
+				{ { 1.0, 2.0 }, { 1.18 }, { /* MEASURE */ }, { /* GEOMETRY */ } },
+				{ { /* MULTIPLY */, /* DIVIDE */ }, { 1.0 }, { /* MEASURE */ }, { /* GEOMETRY */ } },
+				{ { /* MULTIPLY */, /* DIVIDE */ }, { 1.48 }, { /* MEASURE */ }, { /* GEOMETRY */ } } };
 		String[][][] activityText = {
-				{ { "HOW MANY", "WHAT'S NEXT" }, { "ADD", "SUBTRACT" }, { "COMPARE" }, { "NAME THE SHAPE" } },
-				{ {}, { "WHAT TIME" } }, { {}, { "HOW MUCH TIME" } }, { {}, { "PIZZA FRACTIONS" } },
-				{ {}, { "FRACTIONS" } } };
+				{ { "ADD", "SUBTRACT" }, { "HOW MANY", "WHAT'S NEXT" }, { "COMPARE" }, { "NAME THE SHAPE" } },
+				{ { "ADD", "SUBTRACT" }, { "WHAT TIME" }, { /* COMPARE */ }, { "NAME THE SHAPE" } },
+				{ { "ADD", "SUBTRACT" }, { "HOW MUCH TIME" }, { /* MEASURE */ }, { /* GEOMETRY */ } },
+				{ { /* MULTIPLY */, /* DIVIDE */ }, { "PIZZA FRACTIONS" }, { /* MEASURE */ }, { /* GEOMETRY */ } },
+				{ { /* MULTIPLY */, /* DIVIDE */ }, { "FRACTIONS" }, { /* MEASURE */ }, { /* GEOMETRY */ } } };
 
 		JButton[] activityButtons = new JButton[activityImages[gradeSelection][categorySelection].length];
 
@@ -783,6 +940,7 @@ public class Main {
 					panelList[++panelCounter] = practicePanel;
 					panelTitle[panelCounter] = "TIME TO PRACTICE!";
 					headerLabel.setText(panelTitle[panelCounter]);
+					activityButtons[j].setBackground(new Color(GREEN_RGB[0], GREEN_RGB[1], GREEN_RGB[2]));
 					switchPanel(practicePanel);
 				}
 			});
@@ -796,9 +954,6 @@ public class Main {
 		layeredPane.add(practicePanel, "name_180577775611500");
 		practicePanel.setBackground(new Color(0, 0, 0, 0));
 		practicePanel.setLayout(null);
-
-		// Update headerLabel text
-		headerLabel.setText("PRACTICE");
 
 		// Set practice panel width and height
 		int panelWidth = layeredPane.getWidth() - PRIMARY_RATIO * 8;
@@ -880,6 +1035,18 @@ public class Main {
 			button.setBorder(raisedbevel);
 			button.setBorderPainted(true);
 		}
+
+		button.addMouseListener(new MouseAdapter() {
+			@Override
+			public void mouseEntered(MouseEvent e) {
+				button.setBackground(Color.YELLOW);
+			}
+
+			@Override
+			public void mouseExited(MouseEvent e) {
+				button.setBackground(new Color(rgb[0], rgb[1], rgb[2]));
+			}
+		});
 	}
 
 	////////// CHOOSE QUESTION //////////
@@ -896,28 +1063,8 @@ public class Main {
 			// Switch for category selection
 			switch (categorySelection) {
 
-			// Grade K: Count
-			case 0:
-
-				// Switch for activity selection
-				switch (activitySelection) {
-
-				// Grade K: Count: How many
-				case 0:
-					createQuestionHowMany(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
-							practicePanelLabel, practiceOrTestPanel);
-					break;
-
-				// Grade K: Count: Next sequence
-				case 1:
-					createQuestionNextSequence(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
-							practicePanelLabel, practiceOrTestPanel);
-					break;
-				}
-				break;
-
 			// Grade K: Addition/Subtraction
-			case 1:
+			case 0:
 
 				// Switch for activity selection
 				switch (activitySelection) {
@@ -936,20 +1083,40 @@ public class Main {
 				}
 				break;
 
+			// Grade K: Count
+			case 1:
+
+				// Switch for activity selection
+				switch (activitySelection) {
+
+				// Grade K: Count: How many
+				case 0:
+					createQuestionHowMany(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel, practiceOrTestPanel);
+					break;
+
+				// Grade K: Count: Next sequence
+				case 1:
+					createQuestionNextSequence(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel, practiceOrTestPanel);
+					break;
+				}
+				break;
+
 			// Grade K: Compare
 			case 2:
 
 				// Grade K: Compare: Compare
-				createQuestionCompare(practicePanelImageLabel, practicePanelTextLabel, nextQuestion, practicePanelLabel,
-						practiceOrTestPanel);
+				createQuestionCompare(gradeSelection, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+						practicePanelLabel, practiceOrTestPanel);
 				break;
 
 			// Grade K: Shapes
 			case 3:
 
 				// Grade K: Shapes: What Shape
-				createQuestionShapes(practicePanelImageLabel, practicePanelTextLabel, nextQuestion, practicePanelLabel,
-						practiceOrTestPanel);
+				createQuestionShapes(gradeSelection, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+						practicePanelLabel, practiceOrTestPanel);
 
 				break;
 
@@ -962,23 +1129,84 @@ public class Main {
 			// Switch for category selection
 			switch (categorySelection) {
 
+			// Grade 1: Addition/Subtraction
+			case 0:
+
+				// Switch for activity selection
+				switch (activitySelection) {
+
+				// Grade 1: Addition/Subtraction: Addition
+				case 0:
+					createAdditionQuestions(gradeSelection, 1, practicePanelImageLabel, practicePanelTextLabel,
+							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					break;
+
+				// Grade 1: Addition/Subtraction: Subtraction
+				case 1:
+					createAdditionQuestions(gradeSelection, 2, practicePanelImageLabel, practicePanelTextLabel,
+							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					break;
+				}
+				break;
+
 			// Grade 1: Time and Money
 			case 1:
 				createQuestionWhatTime(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
 						practicePanelLabel, practiceOrTestPanel);
+				break;
+
+			// Grade 1: Compare
+			case 2:
+				// ??????
+				break;
+
+			// Grade 1: Shapes
+			case 3:
+				// ??????
 				break;
 			}
 			break;
 
 		// Grade 2:
 		case 2:
+
 			// Switch for category selection
 			switch (categorySelection) {
+
+			// Grade 2: Addition/Subtraction
+			case 0:
+
+				// Switch for activity selection
+				switch (activitySelection) {
+
+				// Grade 2: Addition/Subtraction: Addition
+				case 0:
+					createAdditionQuestions(gradeSelection, 1, practicePanelImageLabel, practicePanelTextLabel,
+							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					break;
+
+				// Grade 2: Addition/Subtraction: Subtraction
+				case 1:
+					createAdditionQuestions(gradeSelection, 2, practicePanelImageLabel, practicePanelTextLabel,
+							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					break;
+				}
+				break;
 
 			// Grade 2: Time and Money
 			case 1:
 				createQuestionHowMuchTime(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
 						practicePanelLabel, practiceOrTestPanel);
+				break;
+
+			// Grade 2: Measure
+			case 2:
+				// ??????
+				break;
+
+			// Grade 2: Geometry
+			case 3:
+				// ??????
 				break;
 			}
 			break;
@@ -988,27 +1216,113 @@ public class Main {
 			// Switch for category selection
 			switch (categorySelection) {
 
+			// Grade 3: Geometry
+			case 0:
+
+				// Switch for activity selection
+				switch (activitySelection) {
+
+				// Grade 3: Multiplication/Division: Multiplication
+				case 0:
+					// createMultDivisionQuestions(gradeSelection, 3, practicePanelImageLabel,
+					// practicePanelTextLabel, nextQuestion,
+					// practicePanelLabel, practiceOrTestPanel);
+					break;
+
+				// Grade 3: Multiplication/Division: Division
+				case 1:
+					// createMultDivisionQuestions(gradeSelection, 4, practicePanelImageLabel,
+					// practicePanelTextLabel, nextQuestion,
+					// practicePanelLabel, practiceOrTestPanel);
+					break;
+				}
+				break;
+
 			// Grade 3: Fractions
 			case 1:
 				createQuestionFractions(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
 						practicePanelLabel, practiceOrTestPanel);
 				break;
+
+			// Grade 3: Measure
+			case 2:
+				// ??????
+				break;
+
+			// Grade 3: Geometry
+			case 3:
+				// ??????
+				break;
 			}
 			break;
 
-		// Grade 3:
+		// Grade 4:
 		case 4:
 			// Switch for category selection
 			switch (categorySelection) {
+
+			// Grade 4: Multiplication/Division
+			case 0:
+
+				// Switch for activity selection
+				switch (activitySelection) {
+
+				// Grade 4: Multiplication/Division: Multiplication
+				case 0:
+					// createMultDivisionQuestions(gradeSelection, 3, practicePanelImageLabel,
+					// practicePanelTextLabel, nextQuestion,
+					// practicePanelLabel, practiceOrTestPanel);
+					break;
+
+				// Grade 4: Multiplication/Division: Division
+				case 1:
+					// createMultDivisionQuestions(gradeSelection, 4, practicePanelImageLabel,
+					// practicePanelTextLabel, nextQuestion,
+					// practicePanelLabel, practiceOrTestPanel);
+					break;
+				}
+				break;
 
 			// Grade 4: Fraction Equivalences
 			case 1:
 				createQuestionFractionEquivalences(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
 						practicePanelLabel, practiceOrTestPanel);
 				break;
+
+			// Grade 4: Measure
+			case 2:
+				// ??????
+				break;
+
+			// Grade 4: Geometry
+			case 3:
+				// ??????
+				break;
 			}
 			break;
 		}
+	}
+
+	////////// QUESTION: GRADE K: ADDITION //////////
+	public void createAdditionQuestions(int gradeSelection, int operation, JLabel practicePanelImageLabel,
+			JLabel practicePanelTextLabel, JButton nextQuestion, JLabel practicePanelLabel,
+			JPanel practiceOrTestPanel) {
+
+		// Create new ADDITION OR SUBTRACTION object
+		Arithmetic arithmetic = new Arithmetic(gradeSelection, operation);
+		practicePanelTextLabel.setText(arithmetic.getQuestionText());
+		String[] answers = arithmetic.getAnswers();
+		String[] questions = arithmetic.getQuestions();
+		int correctAnswerIndex = arithmetic.getCorrectAnswerIndex();
+
+		practicePanelImageLabel.setVisible(true);
+
+		String question = questions[0] + "  " + questions[1] + "  " + questions[2];
+		practicePanelImageLabel.setText(question);
+		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 2));
+
+		// Create answer buttons
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
 	}
 
 	////////// QUESTION: GRADE K: CHOOSE HOW MANY ANIMALS THERE ARE //////////
@@ -1087,34 +1401,12 @@ public class Main {
 		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
 	}
 
-	////////// QUESTION: GRADE K: ADDITION //////////
-	public void createAdditionQuestions(int gradeSelection, int operation, JLabel practicePanelImageLabel,
-			JLabel practicePanelTextLabel, JButton nextQuestion, JLabel practicePanelLabel,
-			JPanel practiceOrTestPanel) {
-
-		// Create new ADDITION OR SUBTRACTION object
-		Arithmetic arithmetic = new Arithmetic(gradeSelection, operation);
-		practicePanelTextLabel.setText(arithmetic.getQuestionText());
-		String[] answers = arithmetic.getAnswers();
-		String[] questions = arithmetic.getQuestions();
-		int correctAnswerIndex = arithmetic.getCorrectAnswerIndex();
-
-		practicePanelImageLabel.setVisible(true);
-
-		String question = questions[0] + "  " + questions[1] + "  " + questions[2];
-		practicePanelImageLabel.setText(question);
-		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 2));
-
-		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
-	}
-
-	////////// QUESTION: GRADE K: Compare two numbers //////////
-	public void createQuestionCompare(JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
+	////////// QUESTION: GRADE K-1: Compare two numbers //////////
+	public void createQuestionCompare(int gradeSelection, JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
 			JButton nextQuestion, JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
 
 		// Create new Compare object
-		Compare compare = new Compare(0);
+		Compare compare = new Compare(gradeSelection);
 		practicePanelTextLabel.setText(compare.getQuestionText());
 		practicePanelImageLabel.setText(compare.getQuestion());
 		String[] answers = compare.getAnswers();
@@ -1126,8 +1418,8 @@ public class Main {
 
 	}
 
-	////////// QUESTION: GRADE K: Name the shape //////////
-	public void createQuestionShapes(JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
+	////////// QUESTION: GRADE K-1: Name the shape //////////
+	public void createQuestionShapes(int gradeSelection, JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
 			JButton nextQuestion, JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
 
 		// Create new Compare object
@@ -1235,6 +1527,17 @@ public class Main {
 			practiceOrTestPanel.add(answerSelectionButtons[i]);
 
 			int j = i;
+			answerSelectionButtons[i].addMouseListener(new MouseAdapter() {
+				@Override
+				public void mouseEntered(MouseEvent e) {
+					answerSelectionButtons[j].setBackground(new Color(SKY_RGB[0], SKY_RGB[1], SKY_RGB[2]));
+				}
+
+				@Override
+				public void mouseExited(MouseEvent e) {
+					answerSelectionButtons[j].setBackground(new Color(0, 75, 200));
+				}
+			});
 
 			// When answer button is clicked, enable button for next question
 			answerSelectionButtons[i].addActionListener(new ActionListener() {
@@ -1244,13 +1547,18 @@ public class Main {
 					nextQuestion.setBackground(new Color(GREEN_RGB[0], GREEN_RGB[1], GREEN_RGB[2]));
 
 					// If answer is right, highlight button in green and increment test score. Else,
-					// highlight red and reveal
-					// correct answer button
+					// highlight red and reveal correct answer button
 					if (j == correctAnswerIndex) {
 						answerSelectionButtons[j].setBackground(Color.GREEN);
+						answerSelectionButtons[j].setFont(
+								new Font("Arial Unicode MS", Font.PLAIN, answerSelectionButtons[j].getHeight() / 2));
+						answerSelectionButtons[j].setText("\u2714");
 						testScore++;
 					} else {
 						answerSelectionButtons[j].setBackground(Color.RED);
+						answerSelectionButtons[3 - j - correctAnswerIndex].setBackground(Color.RED);
+						answerSelectionButtons[j].setText("X");
+						answerSelectionButtons[3 - j - correctAnswerIndex].setText("X");
 						answerSelectionButtons[correctAnswerIndex].setBackground(Color.GREEN);
 					}
 				}
