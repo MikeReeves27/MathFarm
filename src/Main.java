@@ -28,6 +28,7 @@ import java.util.Random;
 import javax.swing.BorderFactory;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
@@ -44,6 +45,8 @@ public class Main {
 	private JLayeredPane layeredPane;
 	private JPanel loginPanel;
 	private JPanel adminLoginPanel;
+	private JPanel adminHomePanel;
+	private JPanel adminAddUserPanel;
 	private JPanel badgePanel;
 	private JPanel homePanel;
 	private JPanel gradePanel;
@@ -68,9 +71,6 @@ public class Main {
 	private String[] panelTitle = new String[10];
 	private int panelCounter = 0;
 
-	// Global array for tracking if badges are unlocked;
-	private boolean[] badgeUnlocked = new boolean[5];
-
 	// Global array for clickable button RGB values
 	private int[] GREEN_RGB = { 146, 208, 80 };
 	private int[] SKY_RGB = { 139, 197, 219 };
@@ -78,11 +78,13 @@ public class Main {
 
 	// Global variable to keep the user active session
 	boolean isUserLoggedIn = false;
+	boolean isAdminLoggedIn = false;
 
 	// Set raised bevel border variable
 	Border raisedbevel = BorderFactory.createRaisedBevelBorder();
 
 	Login login;
+	String username;
 
 	// Launch the application
 	public static void main(String[] args) {
@@ -210,10 +212,13 @@ public class Main {
 		loginPasswordField.setBorder(BorderFactory.createRaisedBevelBorder());
 		loginPanel.add(loginPasswordField);
 
-		JLabel error = new JLabel("Please enter valid user name and password!");
-		error.setBounds(loginPanel.getWidth() / 3, 225, 450, 50);
-		error.setFont(new Font("Calibri", Font.PLAIN, 20));
+		JLabel error = new JLabel("Please enter valid username and password!");
+		error.setBounds(loginPanel.getWidth() / 2 - loginPanel.getWidth() / 5 + PRIMARY_RATIO,
+				headerPanel.getHeight() + PRIMARY_RATIO * 2, loginPanel.getWidth() / 5 * 2, PRIMARY_RATIO * 2);
+		error.setFont(new Font("Calibri", Font.PLAIN, error.getHeight() / 3));
+		error.setHorizontalAlignment(SwingConstants.CENTER);
 		error.setForeground(Color.RED);
+		error.setBackground(SystemColor.menu);
 		error.setOpaque(true);
 		error.setBorder(raisedbevel);
 		frame.getContentPane().add(error);
@@ -235,6 +240,7 @@ public class Main {
 					error.setVisible(true);
 					return;
 				} else {
+					username = uid;
 					createHomePanel();
 					headerPanel.setVisible(true);
 					error.setVisible(false);
@@ -251,6 +257,7 @@ public class Main {
 		loginPanel.add(adminButton);
 		createButton(adminButton, loginPanel.getWidth() - 100, loginPanel.getHeight() - 100, 50, 50, GREEN_RGB,
 				"/circle.png", loginPanel.getHeight() - PRIMARY_RATIO, loginPanel.getHeight() - PRIMARY_RATIO, false);
+
 		adminButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
 				// createAccount();
@@ -264,6 +271,7 @@ public class Main {
 		});
 	}
 
+	////////// ADMIN LOGIN PANEL //////////
 	public void createAdminLoginPanel() {
 		adminLoginPanel = new JPanel();
 		adminLoginPanel.setBounds(0, 0, layeredPane.getWidth(), layeredPane.getHeight());
@@ -310,13 +318,16 @@ public class Main {
 		loginPasswordField.setBorder(BorderFactory.createRaisedBevelBorder());
 		adminLoginPanel.add(loginPasswordField);
 
-		JLabel error = new JLabel("Please enter valid user name and password!");
-		error.setBounds(adminLoginPanel.getWidth() / 3, 225, 450, 50);
-		error.setFont(new Font("Calibri", Font.PLAIN, 20));
+		JLabel error = new JLabel("Please enter valid admin username and password!");
+		error.setBounds(loginPanel.getWidth() / 2 - loginPanel.getWidth() / 5, 0, loginPanel.getWidth() / 5 * 2,
+				PRIMARY_RATIO * 2);
+		error.setFont(new Font("Calibri", Font.PLAIN, error.getHeight() / 3));
+		error.setHorizontalAlignment(SwingConstants.CENTER);
 		error.setForeground(Color.RED);
+		error.setBackground(SystemColor.menu);
 		error.setOpaque(true);
 		error.setBorder(raisedbevel);
-		frame.getContentPane().add(error);
+		adminLoginPanel.add(error);
 		error.setVisible(false);
 
 		JButton loginButton = new JButton("LOG IN");
@@ -326,6 +337,26 @@ public class Main {
 				GREEN_RGB, null, adminLoginPanel.getHeight() - PRIMARY_RATIO,
 				adminLoginPanel.getHeight() - PRIMARY_RATIO, true);
 		loginButton.setFont(new Font("Calibri", Font.PLAIN, loginButton.getHeight() / 2));
+
+		loginButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				String uid = loginUsernameField.getText();
+				String pwd = String.valueOf(loginPasswordField.getPassword());
+				isAdminLoggedIn = login.adminLogin(loginUsernameField.getText(), pwd);
+				if (uid.equals("") || pwd.equals("") || !isAdminLoggedIn) {
+					error.setVisible(true);
+					return;
+				} else {
+					createAdminHomePanel();
+					// headerPanel.setVisible(true);
+					error.setVisible(false);
+					// heading.setVisible(false);
+					loginUsernameField.setText(null);
+					loginPasswordField.setText(null);
+					switchPanel(adminHomePanel);
+				}
+			}
+		});
 
 		JButton backButton = new JButton("BACK");
 		adminLoginPanel.add(backButton);
@@ -338,6 +369,174 @@ public class Main {
 				switchPanel(loginPanel);
 			}
 		});
+	}
+
+	////////// ADMIN HOME PANEL //////////
+	public void createAdminHomePanel() {
+		adminHomePanel = new JPanel();
+		adminHomePanel.setBounds(0, 0, layeredPane.getWidth(), layeredPane.getHeight());
+		layeredPane.add(adminHomePanel);
+		adminHomePanel.setBackground(SystemColor.menu);
+		adminHomePanel.setLayout(null);
+
+		int[] buttonColor = { 200, 200, 200 };
+
+		JButton addUserButton = new JButton("Add user");
+		adminHomePanel.add(addUserButton);
+		createButton(addUserButton, adminHomePanel.getWidth() / 2 - adminHomePanel.getWidth() / 5 - PRIMARY_RATIO,
+				adminHomePanel.getHeight() / 2 - PRIMARY_RATIO * 3, adminHomePanel.getWidth() / 5, PRIMARY_RATIO * 2,
+				buttonColor, null, adminHomePanel.getHeight() - PRIMARY_RATIO,
+				adminHomePanel.getHeight() - PRIMARY_RATIO, true);
+		addUserButton.setFont(new Font("Calibri", Font.PLAIN, addUserButton.getHeight() / 3));
+
+		addUserButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				createAdminAddUserPanel();
+				switchPanel(adminAddUserPanel);
+			}
+		});
+
+		JButton viewUsersButton = new JButton("View/Edit users");
+		adminHomePanel.add(viewUsersButton);
+		createButton(viewUsersButton, adminHomePanel.getWidth() / 2 + PRIMARY_RATIO,
+				adminHomePanel.getHeight() / 2 - PRIMARY_RATIO * 3, adminHomePanel.getWidth() / 5, PRIMARY_RATIO * 2,
+				buttonColor, null, adminHomePanel.getHeight() - PRIMARY_RATIO,
+				adminHomePanel.getHeight() - PRIMARY_RATIO, true);
+		viewUsersButton.setFont(new Font("Calibri", Font.PLAIN, viewUsersButton.getHeight() / 3));
+
+		JButton viewReportsButton = new JButton("Change password");
+		adminHomePanel.add(viewReportsButton);
+		createButton(viewReportsButton, adminHomePanel.getWidth() / 2 - adminHomePanel.getWidth() / 5 - PRIMARY_RATIO,
+				adminHomePanel.getHeight() / 2, adminHomePanel.getWidth() / 5, PRIMARY_RATIO * 2, buttonColor, null,
+				adminHomePanel.getHeight() - PRIMARY_RATIO, adminHomePanel.getHeight() - PRIMARY_RATIO, true);
+		viewReportsButton.setFont(new Font("Calibri", Font.PLAIN, viewReportsButton.getHeight() / 3));
+
+		JButton changePasswordButton = new JButton("Change password");
+		adminHomePanel.add(changePasswordButton);
+		createButton(changePasswordButton, adminHomePanel.getWidth() / 2 + PRIMARY_RATIO,
+				adminHomePanel.getHeight() / 2, adminHomePanel.getWidth() / 5, PRIMARY_RATIO * 2, buttonColor, null,
+				adminHomePanel.getHeight() - PRIMARY_RATIO, adminHomePanel.getHeight() - PRIMARY_RATIO, true);
+		changePasswordButton.setFont(new Font("Calibri", Font.PLAIN, changePasswordButton.getHeight() / 3));
+
+		JButton logoutButton = new JButton("Log out");
+		adminHomePanel.add(logoutButton);
+		createButton(logoutButton, adminHomePanel.getWidth() / 2 - adminHomePanel.getWidth() / 10,
+				adminHomePanel.getHeight() / 2 + PRIMARY_RATIO * 3, adminHomePanel.getWidth() / 5, PRIMARY_RATIO * 2,
+				buttonColor, null, adminHomePanel.getHeight() - PRIMARY_RATIO,
+				adminHomePanel.getHeight() - PRIMARY_RATIO, true);
+		logoutButton.setFont(new Font("Calibri", Font.PLAIN, logoutButton.getHeight() / 3));
+
+		logoutButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				switchPanel(loginPanel);
+			}
+		});
+
+	}
+
+	////////// ADMIN ADD USER PANEL //////////
+	public void createAdminAddUserPanel() {
+		adminAddUserPanel = new JPanel();
+		adminAddUserPanel.setBounds(0, 0, layeredPane.getWidth(), layeredPane.getHeight());
+		layeredPane.add(adminAddUserPanel);
+		adminAddUserPanel.setBackground(SystemColor.menu);
+		adminAddUserPanel.setLayout(null);
+
+		int[] buttonColor = { 200, 200, 200 };
+
+		JLabel error = new JLabel("Please enter valid data!");
+		error.setBounds(adminAddUserPanel.getWidth() / 3, 150, 450, 50);
+		error.setFont(new Font("Calibri", Font.PLAIN, 20));
+		error.setForeground(Color.RED);
+		error.setOpaque(true);
+		error.setBorder(raisedbevel);
+		frame.getContentPane().add(error);
+		error.setVisible(false);
+
+		JLabel lblUsername = new JLabel("Username:");
+		lblUsername.setBounds(50, 10, 140, 50);
+		adminAddUserPanel.add(lblUsername);
+
+		JLabel lblPassword = new JLabel("Password:");
+		lblPassword.setBounds(50, 65, 140, 50);
+		adminAddUserPanel.add(lblPassword);
+
+		JLabel lblFirstName = new JLabel("First name:");
+		lblFirstName.setBounds(50, 120, 140, 50);
+		adminAddUserPanel.add(lblFirstName);
+
+		JLabel lblLastName = new JLabel("Last name:");
+		lblLastName.setBounds(50, 175, 140, 50);
+		adminAddUserPanel.add(lblLastName);
+
+		JLabel lblGrade = new JLabel("Grade:");
+		lblGrade.setBounds(50, 230, 140, 50);
+		adminAddUserPanel.add(lblGrade);
+
+		JLabel lblDOB = new JLabel("Date Of Birth (YYYY-MM-DD):");
+		lblDOB.setBounds(50, 285, 190, 50);
+		adminAddUserPanel.add(lblDOB);
+
+		JTextField username = new JTextField();
+		username.setBounds(250, 10, 100, 50);
+		adminAddUserPanel.add(username);
+		username.setColumns(20);
+
+		JTextField password = new JPasswordField();
+		password.setBounds(250, 65, 100, 50);
+		adminAddUserPanel.add(password);
+
+		JTextField fName = new JTextField();
+		fName.setBounds(250, 120, 100, 50);
+		adminAddUserPanel.add(fName);
+		fName.setColumns(20);
+
+		JTextField lName = new JTextField();
+		lName.setBounds(250, 175, 100, 50);
+		adminAddUserPanel.add(lName);
+		lName.setColumns(20);
+
+		JTextField grade = new JTextField();
+		grade.setBounds(250, 230, 100, 50);
+		adminAddUserPanel.add(grade);
+		grade.setColumns(1);
+
+		JTextField dob = new JTextField();
+		dob.setBounds(250, 285, 100, 50);
+		adminAddUserPanel.add(dob);
+		dob.setColumns(10);
+
+		JCheckBox grantAdminAccess = new JCheckBox("Admin");
+		grantAdminAccess.setFont(new Font("Calibri", Font.PLAIN, 18));
+		grantAdminAccess.setBounds(400, 285, 100, 50);
+		adminAddUserPanel.add(grantAdminAccess);
+
+		JButton createUser = new JButton("Create User");
+		createUser.setForeground(Color.BLUE);
+		createUser.setBounds(250, 340, 150, 55);
+		adminAddUserPanel.add(createUser);
+
+		createUser.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				login.addUser(username.getText(), password.getText(), fName.getText(), lName.getText(), grade.getText(),
+						dob.getText(), grantAdminAccess.isSelected());
+			}
+		});
+
+		JButton backButton = new JButton("Log out");
+		adminAddUserPanel.add(backButton);
+		createButton(backButton, adminAddUserPanel.getWidth() / 2 - adminAddUserPanel.getWidth() / 10,
+				adminAddUserPanel.getHeight() / 2 + PRIMARY_RATIO * 3, adminAddUserPanel.getWidth() / 5,
+				PRIMARY_RATIO * 2, buttonColor, null, adminAddUserPanel.getHeight() - PRIMARY_RATIO,
+				adminAddUserPanel.getHeight() - PRIMARY_RATIO, true);
+		backButton.setFont(new Font("Calibri", Font.PLAIN, backButton.getHeight() / 3));
+
+		backButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				switchPanel(adminHomePanel);
+			}
+		});
+
 	}
 
 	////////// HEADER PANEL //////////
@@ -523,7 +722,7 @@ public class Main {
 
 			// If the badge has been unlocked by user, display golden badge. Otherwise,
 			// display blank badge
-			if (badgeUnlocked[i] == true) {
+			if (login.isBadgeUnlocked(username, i)) {
 				badgeImage = new ImageIcon(this.getClass().getResource(badgeList[i])).getImage()
 						.getScaledInstance(badgeSize, badgeSize, java.awt.Image.SCALE_SMOOTH);
 			} else {
@@ -553,6 +752,8 @@ public class Main {
 		panelList[panelCounter] = homePanel;
 		panelTitle[panelCounter] = "CHOOSE YOUR GRADE";
 		headerLabel.setText(panelTitle[panelCounter]);
+
+		// login.getTestResults(username, 0, 0);
 
 		// Array for each home panel animal button
 		JButton[] homePanelButtons = new JButton[5];
@@ -931,10 +1132,11 @@ public class Main {
 			// If test is over, display result
 		} else {
 			testPanelImageLabel.setText(testScore + " / 10");
+			login.getTestResults(username, gradeSelection, testScore);
 
 			// If user scores successful score, unlocked grade's badge
 			if (testScore > 7) {
-				badgeUnlocked[gradeSelection] = true;
+				login.unlockBadge(username, gradeSelection);
 			}
 		}
 
