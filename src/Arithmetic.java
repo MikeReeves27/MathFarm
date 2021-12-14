@@ -4,50 +4,60 @@ public class Arithmetic {
 	private int grade;
 	private int correctAnswer;
 	private int correctAnswerIndex;
-	private int range;
 	private int wrongAnswer1;
 	private int wrongAnswer2;
 	private String[] answers;
 	private String[] questions;
-	private String questionText;
 
-	static int ADDITION = 1;
-	static int SUBTRACTION = 2;
-	static int MULTIPLICATION = 3;
-	static int DIVISION = 4;
+//	static int ADDITION = 1;
+//	static int SUBTRACTION = 2;
+//	static int MULTIPLICATION = 3;
+//	static int DIVISION = 4;
 
 	Random rand = new Random();
 
 	public Arithmetic(int grade, int operation) {
 		this.grade = grade;
 
-		// If K grade is chosen, set range to 5
-		if (grade == 0) {
-			range = 5;
-		}
+		int[][] numberRanges = { { 5, 10 }, { 10, 20 }, { 10, 20 }, { 0, 0, 8, 8 }, { 0, 0, 10, 10 } };
 
+		// range = getRange(grade);
 		// Randomly assign 1 correct answer and 2 wrong answers
 		// Run loops to ensure all 3 answers are different
-		int q1 = rand.nextInt(range) + 1;
-		int q2 = rand.nextInt(range) + 1;
+		int q1 = rand.nextInt(numberRanges[grade][operation]) + 1;
+		int q2 = rand.nextInt(numberRanges[grade][operation]) + 1;
 
-		if (operation == SUBTRACTION || operation == DIVISION) {
+		if (operation == 1) {
 			while (true) {
-				q2 = rand.nextInt(range - 1);
+				q2 = rand.nextInt(numberRanges[grade][operation] - 1);
 				if (q2 < q1)
 					break;
 			}
 		}
+		if (operation == 2) {
+			q1 += 2;
+			q2 += 2;
+		}
+		if (operation == 3) {
+			q1 += 2;
+			q2 += 2;
+			q1 *= q2;
+
+		}
 
 		questions = new String[3];
 
+		String[] operators = { "+", "-", "x", "/" };
 		questions[0] = String.valueOf(q1);
-		questions[1] = getOperator(operation);
+		questions[1] = operators[operation];
 		questions[2] = String.valueOf(q2);
 
 		correctAnswer = buildCorrectAnswer(operation, q1, q2);
 		while (true) {
-			int answer = rand.nextInt(range) + 1;
+			int answer = rand.nextInt(numberRanges[grade][operation]) + 1;
+			if (operation == 2) {
+				answer *= q1;
+			}
 			if (answer != correctAnswer) {
 				wrongAnswer1 = answer;
 				break;
@@ -55,7 +65,10 @@ public class Arithmetic {
 		}
 
 		while (true) {
-			int answer = rand.nextInt(range) + 1;
+			int answer = rand.nextInt(numberRanges[grade][operation]) + 1;
+			if (operation == 2) {
+				answer *= q2;
+			}
 			if (answer != correctAnswer && answer != wrongAnswer1) {
 				wrongAnswer2 = answer;
 				break;
@@ -80,43 +93,25 @@ public class Arithmetic {
 			}
 		}
 
-		this.questionText = "What does this equal?";
-
 	}
 
 	public int buildCorrectAnswer(int operation, int operand1, int operand2) {
 
-		if (operation == ADDITION) {
+		if (operation == 0) {
 			return (operand1 + operand2);
 		}
-		if (operation == SUBTRACTION) {
+		if (operation == 1) {
 			return (operand1 - operand2);
 		}
-		if (operation == MULTIPLICATION) {
+		if (operation == 2) {
 			return (operand1 * operand2);
 		}
-		if (operation == DIVISION) {
+		if (operation == 3) {
 			return (operand1 / operand2);
 		}
 
 		return (operand1 + operand2);
 
-	}
-
-	public String getOperator(int operation) {
-		if (operation == ADDITION) {
-			return "+";
-		}
-		if (operation == SUBTRACTION) {
-			return "-";
-		}
-		if (operation == MULTIPLICATION) {
-			return "*";
-		}
-		if (operation == DIVISION) {
-			return "/";
-		}
-		return "+";
 	}
 
 	public int getCorrectAnswer() {
@@ -133,10 +128,6 @@ public class Arithmetic {
 
 	public String[] getQuestions() {
 		return questions;
-	}
-
-	public String getQuestionText() {
-		return questionText;
 	}
 
 }
