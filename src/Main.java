@@ -12,6 +12,7 @@
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Desktop;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.GridLayout;
@@ -23,6 +24,7 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Random;
 
 import javax.swing.BorderFactory;
@@ -34,6 +36,8 @@ import javax.swing.JLabel;
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.Border;
@@ -47,6 +51,7 @@ public class Main {
 	private JPanel adminLoginPanel;
 	private JPanel adminHomePanel;
 	private JPanel adminAddUserPanel;
+	private JPanel adminReportsPanel;
 	private JPanel badgePanel;
 	private JPanel homePanel;
 	private JPanel gradePanel;
@@ -62,6 +67,8 @@ public class Main {
 	int FRAME_WIDTH_BUFFER;
 	int FRAME_HEIGHT_BUFFER;
 
+	private JLabel backgroundLabel;
+
 	// Global ints for user's test score
 	private int testScore = 0;
 	private int testCounter = 0;
@@ -75,6 +82,7 @@ public class Main {
 	private int[] GREEN_RGB = { 146, 208, 80 };
 	private int[] SKY_RGB = { 139, 197, 219 };
 	private int[] DARK_GREEN_RGB = { 0, 176, 80 };
+	private int[] GRAY_BUTTON = { 200, 200, 200 };
 
 	// Global variable to keep the user active session
 	boolean isUserLoggedIn = false;
@@ -228,7 +236,7 @@ public class Main {
 		loginPanel.add(loginButton);
 		createButton(loginButton, loginPanel.getWidth() / 2 - loginPanel.getWidth() / 10,
 				loginPanel.getHeight() / 2 + PRIMARY_RATIO * 3, loginPanel.getWidth() / 5, PRIMARY_RATIO * 2, GREEN_RGB,
-				null, loginPanel.getHeight() - PRIMARY_RATIO, loginPanel.getHeight() - PRIMARY_RATIO, true);
+				null, 1, 1, true);
 		loginButton.setFont(new Font("Calibri", Font.PLAIN, loginButton.getHeight() / 2));
 
 		loginButton.addActionListener(new ActionListener() {
@@ -276,17 +284,16 @@ public class Main {
 		adminLoginPanel = new JPanel();
 		adminLoginPanel.setBounds(0, 0, layeredPane.getWidth(), layeredPane.getHeight());
 		layeredPane.add(adminLoginPanel);
-		adminLoginPanel.setBackground(SystemColor.menu);
 		adminLoginPanel.setLayout(null);
+
+		backgroundLabel.setVisible(false);
 
 		JLabel loginUsername = new JLabel("USERNAME:");
 		loginUsername.setHorizontalAlignment(SwingConstants.CENTER);
 		loginUsername.setBounds(adminLoginPanel.getWidth() / 2 - adminLoginPanel.getWidth() / 5,
 				adminLoginPanel.getHeight() / 2 - PRIMARY_RATIO * 3, adminLoginPanel.getWidth() / 5, PRIMARY_RATIO * 2);
 		loginUsername.setFont(new Font("Calibri", Font.PLAIN, loginUsername.getHeight() / 2));
-		loginUsername.setBackground(Color.GRAY);
 		loginUsername.setOpaque(true);
-		loginUsername.setBorder(raisedbevel);
 
 		adminLoginPanel.add(loginUsername);
 
@@ -295,9 +302,7 @@ public class Main {
 		loginPassword.setBounds(adminLoginPanel.getWidth() / 2 - adminLoginPanel.getWidth() / 5,
 				adminLoginPanel.getHeight() / 2, adminLoginPanel.getWidth() / 5, PRIMARY_RATIO * 2);
 		loginPassword.setFont(new Font("Calibri", Font.PLAIN, loginPassword.getHeight() / 2));
-		loginPassword.setBackground(Color.GRAY);
 		loginPassword.setOpaque(true);
-		loginPassword.setBorder(raisedbevel);
 		adminLoginPanel.add(loginPassword);
 
 		JTextField loginUsernameField = new JTextField();
@@ -305,7 +310,7 @@ public class Main {
 				adminLoginPanel.getHeight() / 2 - PRIMARY_RATIO * 3, adminLoginPanel.getWidth() / 5, PRIMARY_RATIO * 2);
 		loginUsernameField.setColumns(20);
 		loginUsernameField.setFont(new Font("Calibri", Font.PLAIN, loginUsernameField.getHeight() / 2));
-		loginUsernameField.setBackground(SystemColor.menu);
+		loginUsernameField.setBackground(Color.WHITE);
 		loginUsernameField.setBorder(BorderFactory.createRaisedBevelBorder());
 		adminLoginPanel.add(loginUsernameField);
 
@@ -314,7 +319,7 @@ public class Main {
 				adminLoginPanel.getWidth() / 5, PRIMARY_RATIO * 2);
 		loginPasswordField.setColumns(20);
 		loginPasswordField.setFont(new Font("Calibri", Font.PLAIN, loginPasswordField.getHeight() / 2));
-		loginPasswordField.setBackground(SystemColor.menu);
+		loginPasswordField.setBackground(Color.WHITE);
 		loginPasswordField.setBorder(BorderFactory.createRaisedBevelBorder());
 		adminLoginPanel.add(loginPasswordField);
 
@@ -332,10 +337,9 @@ public class Main {
 
 		JButton loginButton = new JButton("LOG IN");
 		adminLoginPanel.add(loginButton);
-		createButton(loginButton, adminLoginPanel.getWidth() / 2 - adminLoginPanel.getWidth() / 10,
-				adminLoginPanel.getHeight() / 2 + PRIMARY_RATIO * 3, adminLoginPanel.getWidth() / 5, PRIMARY_RATIO * 2,
-				GREEN_RGB, null, adminLoginPanel.getHeight() - PRIMARY_RATIO,
-				adminLoginPanel.getHeight() - PRIMARY_RATIO, true);
+		createButton(loginButton, adminLoginPanel.getWidth() / 2 + PRIMARY_RATIO / 2,
+				adminLoginPanel.getHeight() / 2 + PRIMARY_RATIO * 3, adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 2,
+				PRIMARY_RATIO * 2, GRAY_BUTTON, null, 1, 1, true);
 		loginButton.setFont(new Font("Calibri", Font.PLAIN, loginButton.getHeight() / 2));
 
 		loginButton.addActionListener(new ActionListener() {
@@ -353,6 +357,7 @@ public class Main {
 					// heading.setVisible(false);
 					loginUsernameField.setText(null);
 					loginPasswordField.setText(null);
+					loginButton.setBackground(new Color(GRAY_BUTTON[0], GRAY_BUTTON[1], GRAY_BUTTON[2]));
 					switchPanel(adminHomePanel);
 				}
 			}
@@ -360,12 +365,15 @@ public class Main {
 
 		JButton backButton = new JButton("BACK");
 		adminLoginPanel.add(backButton);
-		createButton(backButton, 0, 300, adminLoginPanel.getWidth() / 5, PRIMARY_RATIO * 2, GREEN_RGB, null,
-				adminLoginPanel.getHeight() - PRIMARY_RATIO, adminLoginPanel.getHeight() - PRIMARY_RATIO, true);
+		createButton(backButton, adminLoginPanel.getWidth() / 2 - adminLoginPanel.getWidth() / 5,
+				adminLoginPanel.getHeight() / 2 + PRIMARY_RATIO * 3, adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 2,
+				PRIMARY_RATIO * 2, GRAY_BUTTON, null, 1, 1, true);
 		backButton.setFont(new Font("Calibri", Font.PLAIN, loginButton.getHeight() / 2));
 
 		backButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
+				backgroundLabel.setVisible(true);
+				backButton.setBackground(new Color(GRAY_BUTTON[0], GRAY_BUTTON[1], GRAY_BUTTON[2]));
 				switchPanel(loginPanel);
 			}
 		});
@@ -379,19 +387,17 @@ public class Main {
 		adminHomePanel.setBackground(SystemColor.menu);
 		adminHomePanel.setLayout(null);
 
-		int[] buttonColor = { 200, 200, 200 };
-
 		JButton addUserButton = new JButton("Add user");
 		adminHomePanel.add(addUserButton);
 		createButton(addUserButton, adminHomePanel.getWidth() / 2 - adminHomePanel.getWidth() / 5 - PRIMARY_RATIO,
 				adminHomePanel.getHeight() / 2 - PRIMARY_RATIO * 3, adminHomePanel.getWidth() / 5, PRIMARY_RATIO * 2,
-				buttonColor, null, adminHomePanel.getHeight() - PRIMARY_RATIO,
-				adminHomePanel.getHeight() - PRIMARY_RATIO, true);
+				GRAY_BUTTON, null, 1, 1, true);
 		addUserButton.setFont(new Font("Calibri", Font.PLAIN, addUserButton.getHeight() / 3));
 
 		addUserButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
 				createAdminAddUserPanel();
+				addUserButton.setBackground(new Color(GRAY_BUTTON[0], GRAY_BUTTON[1], GRAY_BUTTON[2]));
 				switchPanel(adminAddUserPanel);
 			}
 		});
@@ -400,35 +406,43 @@ public class Main {
 		adminHomePanel.add(viewUsersButton);
 		createButton(viewUsersButton, adminHomePanel.getWidth() / 2 + PRIMARY_RATIO,
 				adminHomePanel.getHeight() / 2 - PRIMARY_RATIO * 3, adminHomePanel.getWidth() / 5, PRIMARY_RATIO * 2,
-				buttonColor, null, adminHomePanel.getHeight() - PRIMARY_RATIO,
-				adminHomePanel.getHeight() - PRIMARY_RATIO, true);
+				GRAY_BUTTON, null, 1, 1, true);
 		viewUsersButton.setFont(new Font("Calibri", Font.PLAIN, viewUsersButton.getHeight() / 3));
 
-		JButton viewReportsButton = new JButton("Change password");
+		JButton viewReportsButton = new JButton("View reports");
 		adminHomePanel.add(viewReportsButton);
 		createButton(viewReportsButton, adminHomePanel.getWidth() / 2 - adminHomePanel.getWidth() / 5 - PRIMARY_RATIO,
-				adminHomePanel.getHeight() / 2, adminHomePanel.getWidth() / 5, PRIMARY_RATIO * 2, buttonColor, null,
-				adminHomePanel.getHeight() - PRIMARY_RATIO, adminHomePanel.getHeight() - PRIMARY_RATIO, true);
+				adminHomePanel.getHeight() / 2, adminHomePanel.getWidth() / 5, PRIMARY_RATIO * 2, GRAY_BUTTON, null, 1,
+				1, true);
 		viewReportsButton.setFont(new Font("Calibri", Font.PLAIN, viewReportsButton.getHeight() / 3));
+
+		viewReportsButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				createAdminReportsPanel();
+				viewReportsButton.setBackground(new Color(GRAY_BUTTON[0], GRAY_BUTTON[1], GRAY_BUTTON[2]));
+				switchPanel(adminReportsPanel);
+			}
+		});
 
 		JButton changePasswordButton = new JButton("Change password");
 		adminHomePanel.add(changePasswordButton);
 		createButton(changePasswordButton, adminHomePanel.getWidth() / 2 + PRIMARY_RATIO,
-				adminHomePanel.getHeight() / 2, adminHomePanel.getWidth() / 5, PRIMARY_RATIO * 2, buttonColor, null,
-				adminHomePanel.getHeight() - PRIMARY_RATIO, adminHomePanel.getHeight() - PRIMARY_RATIO, true);
+				adminHomePanel.getHeight() / 2, adminHomePanel.getWidth() / 5, PRIMARY_RATIO * 2, GRAY_BUTTON, null, 1,
+				1, true);
 		changePasswordButton.setFont(new Font("Calibri", Font.PLAIN, changePasswordButton.getHeight() / 3));
 
 		JButton logoutButton = new JButton("Log out");
 		adminHomePanel.add(logoutButton);
 		createButton(logoutButton, adminHomePanel.getWidth() / 2 - adminHomePanel.getWidth() / 10,
 				adminHomePanel.getHeight() / 2 + PRIMARY_RATIO * 3, adminHomePanel.getWidth() / 5, PRIMARY_RATIO * 2,
-				buttonColor, null, adminHomePanel.getHeight() - PRIMARY_RATIO,
-				adminHomePanel.getHeight() - PRIMARY_RATIO, true);
+				GRAY_BUTTON, null, 1, 1, true);
 		logoutButton.setFont(new Font("Calibri", Font.PLAIN, logoutButton.getHeight() / 3));
 
 		logoutButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
 				switchPanel(loginPanel);
+				logoutButton.setBackground(new Color(GRAY_BUTTON[0], GRAY_BUTTON[1], GRAY_BUTTON[2]));
+				backgroundLabel.setVisible(true);
 			}
 		});
 
@@ -442,8 +456,6 @@ public class Main {
 		adminAddUserPanel.setBackground(SystemColor.menu);
 		adminAddUserPanel.setLayout(null);
 
-		int[] buttonColor = { 200, 200, 200 };
-
 		JLabel error = new JLabel("Please enter valid data!");
 		error.setBounds(adminAddUserPanel.getWidth() / 3, 150, 450, 50);
 		error.setFont(new Font("Calibri", Font.PLAIN, 20));
@@ -454,67 +466,113 @@ public class Main {
 		error.setVisible(false);
 
 		JLabel lblUsername = new JLabel("Username:");
-		lblUsername.setBounds(50, 10, 140, 50);
+		lblUsername
+				.setBounds(
+						adminLoginPanel.getWidth() / 2 - ((adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3) / 3 * 2)
+								- PRIMARY_RATIO / 2,
+						0, adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3, PRIMARY_RATIO);
 		adminAddUserPanel.add(lblUsername);
+		lblUsername.setFont(new Font("Calibri", Font.PLAIN, lblUsername.getHeight() / 2));
 
 		JLabel lblPassword = new JLabel("Password:");
-		lblPassword.setBounds(50, 65, 140, 50);
+		lblPassword.setBounds(
+				adminLoginPanel.getWidth() / 2 - ((adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3) / 3 * 2)
+						- PRIMARY_RATIO / 2,
+				lblUsername.getY() + PRIMARY_RATIO + PRIMARY_RATIO / 3,
+				(adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3) / 3 * 2, PRIMARY_RATIO);
 		adminAddUserPanel.add(lblPassword);
+		lblPassword.setFont(new Font("Calibri", Font.PLAIN, lblPassword.getHeight() / 2));
 
 		JLabel lblFirstName = new JLabel("First name:");
-		lblFirstName.setBounds(50, 120, 140, 50);
+		lblFirstName.setBounds(
+				adminLoginPanel.getWidth() / 2 - ((adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3) / 3 * 2)
+						- PRIMARY_RATIO / 2,
+				lblPassword.getY() + PRIMARY_RATIO + PRIMARY_RATIO / 3,
+				(adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3) / 3 * 2, PRIMARY_RATIO);
 		adminAddUserPanel.add(lblFirstName);
+		lblFirstName.setFont(new Font("Calibri", Font.PLAIN, lblFirstName.getHeight() / 2));
 
 		JLabel lblLastName = new JLabel("Last name:");
-		lblLastName.setBounds(50, 175, 140, 50);
+		lblLastName.setBounds(
+				adminLoginPanel.getWidth() / 2 - ((adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3) / 3 * 2)
+						- PRIMARY_RATIO / 2,
+				lblFirstName.getY() + PRIMARY_RATIO + PRIMARY_RATIO / 3,
+				(adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3) / 3 * 2, PRIMARY_RATIO);
 		adminAddUserPanel.add(lblLastName);
+		lblLastName.setFont(new Font("Calibri", Font.PLAIN, lblLastName.getHeight() / 2));
 
 		JLabel lblGrade = new JLabel("Grade:");
-		lblGrade.setBounds(50, 230, 140, 50);
+		lblGrade.setBounds(
+				adminLoginPanel.getWidth() / 2 - ((adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3) / 3 * 2)
+						- PRIMARY_RATIO / 2,
+				lblLastName.getY() + PRIMARY_RATIO + PRIMARY_RATIO / 3,
+				(adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3) / 3 * 2, PRIMARY_RATIO);
 		adminAddUserPanel.add(lblGrade);
+		lblGrade.setFont(new Font("Calibri", Font.PLAIN, lblGrade.getHeight() / 2));
 
-		JLabel lblDOB = new JLabel("Date Of Birth (YYYY-MM-DD):");
-		lblDOB.setBounds(50, 285, 190, 50);
+		JLabel lblDOB = new JLabel("D.O.B (YYYY-MM-DD):");
+		lblDOB.setBounds(
+				adminLoginPanel.getWidth() / 2 - ((adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3) / 3 * 2)
+						- PRIMARY_RATIO / 2,
+				lblGrade.getY() + PRIMARY_RATIO + PRIMARY_RATIO / 3,
+				(adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3) / 3 * 2, PRIMARY_RATIO);
 		adminAddUserPanel.add(lblDOB);
+		lblDOB.setFont(new Font("Calibri", Font.PLAIN, lblDOB.getHeight() / 2));
+		lblDOB.setFont(new Font("Calibri", Font.PLAIN, lblDOB.getHeight() / 2));
 
 		JTextField username = new JTextField();
-		username.setBounds(250, 10, 100, 50);
+		username.setBounds(adminHomePanel.getWidth() / 2 + PRIMARY_RATIO / 2, 0,
+				adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3, PRIMARY_RATIO);
 		adminAddUserPanel.add(username);
 		username.setColumns(20);
 
 		JTextField password = new JPasswordField();
-		password.setBounds(250, 65, 100, 50);
+		password.setBounds(adminHomePanel.getWidth() / 2 + PRIMARY_RATIO / 2,
+				username.getY() + PRIMARY_RATIO + PRIMARY_RATIO / 3, adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3,
+				PRIMARY_RATIO);
 		adminAddUserPanel.add(password);
 
 		JTextField fName = new JTextField();
-		fName.setBounds(250, 120, 100, 50);
+		fName.setBounds(adminHomePanel.getWidth() / 2 + PRIMARY_RATIO / 2,
+				password.getY() + PRIMARY_RATIO + PRIMARY_RATIO / 3, adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3,
+				PRIMARY_RATIO);
 		adminAddUserPanel.add(fName);
 		fName.setColumns(20);
 
 		JTextField lName = new JTextField();
-		lName.setBounds(250, 175, 100, 50);
+		lName.setBounds(adminHomePanel.getWidth() / 2 + PRIMARY_RATIO / 2,
+				fName.getY() + PRIMARY_RATIO + PRIMARY_RATIO / 3, adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3,
+				PRIMARY_RATIO);
 		adminAddUserPanel.add(lName);
 		lName.setColumns(20);
 
 		JTextField grade = new JTextField();
-		grade.setBounds(250, 230, 100, 50);
+		grade.setBounds(adminHomePanel.getWidth() / 2 + PRIMARY_RATIO / 2,
+				lName.getY() + PRIMARY_RATIO + PRIMARY_RATIO / 3, adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3,
+				PRIMARY_RATIO);
 		adminAddUserPanel.add(grade);
 		grade.setColumns(1);
 
 		JTextField dob = new JTextField();
-		dob.setBounds(250, 285, 100, 50);
+		dob.setBounds(adminHomePanel.getWidth() / 2 + PRIMARY_RATIO / 2,
+				grade.getY() + PRIMARY_RATIO + PRIMARY_RATIO / 3, adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3,
+				PRIMARY_RATIO);
 		adminAddUserPanel.add(dob);
 		dob.setColumns(10);
 
 		JCheckBox grantAdminAccess = new JCheckBox("Admin");
 		grantAdminAccess.setFont(new Font("Calibri", Font.PLAIN, 18));
-		grantAdminAccess.setBounds(400, 285, 100, 50);
+		grantAdminAccess.setBounds(adminHomePanel.getWidth() / 2 + PRIMARY_RATIO / 2,
+				dob.getY() + PRIMARY_RATIO + PRIMARY_RATIO / 3, adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3,
+				PRIMARY_RATIO);
 		adminAddUserPanel.add(grantAdminAccess);
 
 		JButton createUser = new JButton("Create User");
-		createUser.setForeground(Color.BLUE);
-		createUser.setBounds(250, 340, 150, 55);
+		createButton(createUser, adminAddUserPanel.getWidth() / 2 + PRIMARY_RATIO / 2,
+				adminAddUserPanel.getHeight() / 2 + PRIMARY_RATIO * 3,
+				adminAddUserPanel.getWidth() / 5 - PRIMARY_RATIO / 3, PRIMARY_RATIO * 2, GRAY_BUTTON, null, 1, 1, true);
 		adminAddUserPanel.add(createUser);
+		createUser.setFont(new Font("Calibri", Font.PLAIN, createUser.getHeight() / 3));
 
 		createUser.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
@@ -523,12 +581,64 @@ public class Main {
 			}
 		});
 
-		JButton backButton = new JButton("Log out");
+		JButton backButton = new JButton("Back");
 		adminAddUserPanel.add(backButton);
-		createButton(backButton, adminAddUserPanel.getWidth() / 2 - adminAddUserPanel.getWidth() / 10,
-				adminAddUserPanel.getHeight() / 2 + PRIMARY_RATIO * 3, adminAddUserPanel.getWidth() / 5,
-				PRIMARY_RATIO * 2, buttonColor, null, adminAddUserPanel.getHeight() - PRIMARY_RATIO,
-				adminAddUserPanel.getHeight() - PRIMARY_RATIO, true);
+		createButton(backButton, adminAddUserPanel.getWidth() / 2 - adminAddUserPanel.getWidth() / 5,
+				adminAddUserPanel.getHeight() / 2 + PRIMARY_RATIO * 3,
+				adminAddUserPanel.getWidth() / 5 - PRIMARY_RATIO / 2, PRIMARY_RATIO * 2, GRAY_BUTTON, null, 1, 1, true);
+		backButton.setFont(new Font("Calibri", Font.PLAIN, backButton.getHeight() / 3));
+
+		backButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				switchPanel(adminHomePanel);
+			}
+		});
+
+	}
+
+	////////// ADMIN REPORTS PANEL //////////
+	public void createAdminReportsPanel() {
+		adminReportsPanel = new JPanel();
+		adminReportsPanel.setBounds(0, 0, layeredPane.getWidth(), layeredPane.getHeight());
+		layeredPane.add(adminReportsPanel);
+		adminReportsPanel.setBackground(SystemColor.menu);
+		adminReportsPanel.setLayout(null);
+
+		JTable table = new JTable();
+
+		// Column Names
+		String[] columnNames = { "<html><b>FIRST<br>NAME", "<html><b>LAST<br>NAME", "<html><b>GRADE",
+				"<html><b>HIGHEST<br>K SCORE", "<html><b>AVERAGE<br>K SCORE", "<html><b>TOTAL<br>K TESTS",
+				"<html><b>HIGHEST<br>G1 SCORE", "<html><b>AVERAGE<br>G1 SCORE", "<html><b>TOTAL<br>G1 TESTS",
+				"<html><b>HIGHEST<br>G2 SCORE", "<html><b>AVERAGE<br>G2 SCORE", "<html><b>TOTAL<br>G2 TESTS",
+				"<html><b>HIGHEST<br>G3 SCORE", "<html><b>AVERAGE<br>G3 SCORE", "<html><b>TOTAL<br>G3 TESTS",
+				"<html><b>HIGHEST<br>G4 SCORE", "<html><b>AVERAGE<br>G4 SCORE", "<html><b>TOTAL<br>G4 TESTS" };
+
+		ArrayList<ArrayList<String>> report = new ArrayList<ArrayList<String>>();
+		report = login.getReports();
+		String[][] reportData = new String[report.size()][columnNames.length];
+
+		for (int i = 0; i < reportData.length; i++) {
+			for (int j = 0; j < reportData[i].length; j++) {
+				reportData[i][j] = report.get(i).get(j);
+			}
+		}
+
+		// Initializing JTable
+		table = new JTable(reportData, columnNames);
+		table.setBounds(0, 0, adminReportsPanel.getWidth(),
+				adminReportsPanel.getHeight() - adminReportsPanel.getHeight() / 2 + PRIMARY_RATIO * 2);
+		JScrollPane sp = new JScrollPane(table);
+		table.getTableHeader().setPreferredSize(new Dimension(sp.getWidth(), PRIMARY_RATIO));
+		sp.setBounds(0, 0, adminReportsPanel.getWidth(),
+				adminReportsPanel.getHeight() - adminReportsPanel.getHeight() / 2 + PRIMARY_RATIO * 2);
+		adminReportsPanel.add(sp);
+
+		JButton backButton = new JButton("Back");
+		adminReportsPanel.add(backButton);
+		createButton(backButton, adminReportsPanel.getWidth() / 2 - adminReportsPanel.getWidth() / 10,
+				adminReportsPanel.getHeight() / 2 + PRIMARY_RATIO * 3, adminReportsPanel.getWidth() / 5,
+				PRIMARY_RATIO * 2, GRAY_BUTTON, null, 1, 1, true);
 		backButton.setFont(new Font("Calibri", Font.PLAIN, backButton.getHeight() / 3));
 
 		backButton.addActionListener(new ActionListener() {
@@ -689,6 +799,7 @@ public class Main {
 			public void actionPerformed(ActionEvent e) {
 
 				panelCounter = 0;
+				headerPanel.setVisible(false);
 				switchPanel(loginPanel);
 
 			}
@@ -1257,20 +1368,21 @@ public class Main {
 						{ "/shapes.png" } },
 				{ { "/plusSign.png", "/minusSign.png" }, { "/clock100.png" }, { /* COMPARE */ }, { "/shapes.png" } },
 				{ { "/plusSign.png", "/minusSign.png" }, { "/calendar.png" }, { /* MEASURE */ }, { /* GEOMETRY */ } },
-				{ { /* MULTIPLY */, /* DIVIDE */ }, { "/pizza23.png" }, { /* MEASURE */ }, { /* GEOMETRY */ } },
-				{ { /* MULTIPLY */, /* DIVIDE */ }, { "/fractionEquivalences.png" }, { /* MEASURE */ },
-						{ /* GEOMETRY */ } } };
+				{ { "/multiplicationSign.png", "/divisionSign.png" }, { "/pizza23.png" }, { /* MEASURE */ },
+						{ /* GEOMETRY */ } },
+				{ { "/multiplicationSign.png", "/divisionSign.png" }, { "/fractionEquivalences.png" },
+						{ /* MEASURE */ }, { /* GEOMETRY */ } } };
 		double[][][] activityImageRatios = { { { 1.0, 2.0 }, { 0.93, 3.92 }, { 0.62 }, { 0.93 } },
 				{ { 1.0, 2.0 }, { 1.0 }, { /* COMPARE */ }, { 0.93 } },
 				{ { 1.0, 2.0 }, { 1.18 }, { /* MEASURE */ }, { /* GEOMETRY */ } },
-				{ { /* MULTIPLY */, /* DIVIDE */ }, { 1.0 }, { /* MEASURE */ }, { /* GEOMETRY */ } },
-				{ { /* MULTIPLY */, /* DIVIDE */ }, { 1.48 }, { /* MEASURE */ }, { /* GEOMETRY */ } } };
+				{ { 1.0, 1.0 }, { 1.0 }, { /* MEASURE */ }, { /* GEOMETRY */ } },
+				{ { 1.0, 1.0 }, { 1.48 }, { /* MEASURE */ }, { /* GEOMETRY */ } } };
 		String[][][] activityText = {
 				{ { "ADD", "SUBTRACT" }, { "HOW MANY", "WHAT'S NEXT" }, { "COMPARE" }, { "NAME THE SHAPE" } },
 				{ { "ADD", "SUBTRACT" }, { "WHAT TIME" }, { /* COMPARE */ }, { "NAME THE SHAPE" } },
 				{ { "ADD", "SUBTRACT" }, { "HOW MUCH TIME" }, { /* MEASURE */ }, { /* GEOMETRY */ } },
-				{ { /* MULTIPLY */, /* DIVIDE */ }, { "PIZZA FRACTIONS" }, { /* MEASURE */ }, { /* GEOMETRY */ } },
-				{ { /* MULTIPLY */, /* DIVIDE */ }, { "FRACTIONS" }, { /* MEASURE */ }, { /* GEOMETRY */ } } };
+				{ { "MULTIPLY", "DIVIDE" }, { "PIZZA FRACTIONS" }, { /* MEASURE */ }, { /* GEOMETRY */ } },
+				{ { "MULTIPLY", "DIVIDE" }, { "FRACTIONS" }, { /* MEASURE */ }, { /* GEOMETRY */ } } };
 
 		JButton[] activityButtons = new JButton[activityImages[gradeSelection][categorySelection].length];
 
@@ -1473,14 +1585,14 @@ public class Main {
 
 				// Grade K: Addition/Subtraction: Addition
 				case 0:
-					createAdditionQuestions(gradeSelection, 1, practicePanelImageLabel, practicePanelTextLabel,
-							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					createArithmetic(gradeSelection, 0, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel, practiceOrTestPanel);
 					break;
 
 				// Grade K: Addition/Subtraction: Subtraction
 				case 1:
-					createAdditionQuestions(gradeSelection, 2, practicePanelImageLabel, practicePanelTextLabel,
-							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					createArithmetic(gradeSelection, 1, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel, practiceOrTestPanel);
 					break;
 				}
 				break;
@@ -1539,14 +1651,14 @@ public class Main {
 
 				// Grade 1: Addition/Subtraction: Addition
 				case 0:
-					createAdditionQuestions(gradeSelection, 1, practicePanelImageLabel, practicePanelTextLabel,
-							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					createArithmetic(gradeSelection, 0, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel, practiceOrTestPanel);
 					break;
 
 				// Grade 1: Addition/Subtraction: Subtraction
 				case 1:
-					createAdditionQuestions(gradeSelection, 2, practicePanelImageLabel, practicePanelTextLabel,
-							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					createArithmetic(gradeSelection, 1, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel, practiceOrTestPanel);
 					break;
 				}
 				break;
@@ -1583,14 +1695,14 @@ public class Main {
 
 				// Grade 2: Addition/Subtraction: Addition
 				case 0:
-					createAdditionQuestions(gradeSelection, 1, practicePanelImageLabel, practicePanelTextLabel,
-							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					createArithmetic(gradeSelection, 0, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel, practiceOrTestPanel);
 					break;
 
 				// Grade 2: Addition/Subtraction: Subtraction
 				case 1:
-					createAdditionQuestions(gradeSelection, 2, practicePanelImageLabel, practicePanelTextLabel,
-							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					createArithmetic(gradeSelection, 1, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel, practiceOrTestPanel);
 					break;
 				}
 				break;
@@ -1626,16 +1738,14 @@ public class Main {
 
 				// Grade 3: Multiplication/Division: Multiplication
 				case 0:
-					// createMultDivisionQuestions(gradeSelection, 3, practicePanelImageLabel,
-					// practicePanelTextLabel, nextQuestion,
-					// practicePanelLabel, practiceOrTestPanel);
+					createArithmetic(gradeSelection, 2, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel, practiceOrTestPanel);
 					break;
 
 				// Grade 3: Multiplication/Division: Division
 				case 1:
-					// createMultDivisionQuestions(gradeSelection, 4, practicePanelImageLabel,
-					// practicePanelTextLabel, nextQuestion,
-					// practicePanelLabel, practiceOrTestPanel);
+					createArithmetic(gradeSelection, 3, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel, practiceOrTestPanel);
 					break;
 				}
 				break;
@@ -1671,16 +1781,14 @@ public class Main {
 
 				// Grade 4: Multiplication/Division: Multiplication
 				case 0:
-					// createMultDivisionQuestions(gradeSelection, 3, practicePanelImageLabel,
-					// practicePanelTextLabel, nextQuestion,
-					// practicePanelLabel, practiceOrTestPanel);
+					createArithmetic(gradeSelection, 2, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel, practiceOrTestPanel);
 					break;
 
 				// Grade 4: Multiplication/Division: Division
 				case 1:
-					// createMultDivisionQuestions(gradeSelection, 4, practicePanelImageLabel,
-					// practicePanelTextLabel, nextQuestion,
-					// practicePanelLabel, practiceOrTestPanel);
+					createArithmetic(gradeSelection, 3, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel, practiceOrTestPanel);
 					break;
 				}
 				break;
@@ -1705,14 +1813,14 @@ public class Main {
 		}
 	}
 
-	////////// QUESTION: GRADE K: ADDITION //////////
-	public void createAdditionQuestions(int gradeSelection, int operation, JLabel practicePanelImageLabel,
+	////////// QUESTION: GRADE K-4: ADDITION, SUBTRACTION, MULTIPLICATION, DIVISION
+	////////// //////////
+	public void createArithmetic(int gradeSelection, int operation, JLabel practicePanelImageLabel,
 			JLabel practicePanelTextLabel, JButton nextQuestion, JLabel practicePanelLabel,
 			JPanel practiceOrTestPanel) {
 
-		// Create new ADDITION OR SUBTRACTION object
+		// Create new arithmetic object
 		Arithmetic arithmetic = new Arithmetic(gradeSelection, operation);
-		practicePanelTextLabel.setText(arithmetic.getQuestionText());
 		String[] answers = arithmetic.getAnswers();
 		String[] questions = arithmetic.getQuestions();
 		int correctAnswerIndex = arithmetic.getCorrectAnswerIndex();
@@ -1932,18 +2040,28 @@ public class Main {
 			answerSelectionButtons[i].addMouseListener(new MouseAdapter() {
 				@Override
 				public void mouseEntered(MouseEvent e) {
-					answerSelectionButtons[j].setBackground(new Color(SKY_RGB[0], SKY_RGB[1], SKY_RGB[2]));
+					if (answerSelectionButtons[j].isEnabled()) {
+						answerSelectionButtons[j].setBackground(new Color(SKY_RGB[0], SKY_RGB[1], SKY_RGB[2]));
+					}
+
 				}
 
 				@Override
 				public void mouseExited(MouseEvent e) {
-					answerSelectionButtons[j].setBackground(new Color(0, 75, 200));
+					if (answerSelectionButtons[j].isEnabled()) {
+						answerSelectionButtons[j].setBackground(new Color(0, 75, 200));
+					}
+
 				}
 			});
 
 			// When answer button is clicked, enable button for next question
 			answerSelectionButtons[i].addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+
+					answerSelectionButtons[0].setEnabled(false);
+					answerSelectionButtons[1].setEnabled(false);
+					answerSelectionButtons[2].setEnabled(false);
 
 					nextQuestion.setEnabled(true);
 					nextQuestion.setBackground(new Color(GREEN_RGB[0], GREEN_RGB[1], GREEN_RGB[2]));
@@ -1973,7 +2091,7 @@ public class Main {
 	public void setBackground() {
 
 		// Set background image
-		JLabel backgroundLabel = new JLabel();
+		backgroundLabel = new JLabel();
 
 		// Set background to same size as frame, minus buffer to account for external
 		// frame edge region
