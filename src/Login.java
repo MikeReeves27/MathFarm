@@ -4,6 +4,7 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class Login {
 	Connection connection = null;
@@ -92,6 +93,63 @@ public class Login {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+
+	public ArrayList<ArrayList<String>> getReports() {
+		ArrayList<ArrayList<String>> report = new ArrayList<ArrayList<String>>();
+		String sql = "SELECT FIRSTNAME, LASTNAME, GRADE, BEST0, TOTAL0, COUNTER0, BEST1, TOTAL1, COUNTER1, BEST2, TOTAL2, COUNTER2, BEST3, TOTAL3, COUNTER3, BEST4, TOTAL4, COUNTER4 FROM USERTABLE;";
+
+		String fname;
+		String lname;
+		String grade;
+		int bestScore = 0;
+		int totalScore = 0;
+		int scoreCounter = 0;
+
+		try {
+			PreparedStatement statement = connection.prepareStatement(sql);
+			ResultSet rs = statement.executeQuery();
+			int userCounter = 0;
+			int gradeCounter = 0;
+			while (rs.next()) {
+				ArrayList<String> innerReport = new ArrayList<String>();
+				String sqlFName = "FIRSTNAME";
+				fname = rs.getString(sqlFName);
+				innerReport.add(fname);
+				String sqlLName = "LASTNAME";
+				lname = rs.getString(sqlLName);
+				innerReport.add(lname);
+				String sqlGrade = "GRADE";
+				grade = rs.getString(sqlGrade);
+				innerReport.add(grade);
+				for (int i = 0; i < 5; i++) {
+					String sqlBest = "BEST" + i;
+					bestScore = rs.getInt(sqlBest);
+					innerReport.add(String.valueOf(bestScore));
+					String sqlTotal = "TOTAL" + i;
+					totalScore = rs.getInt(sqlTotal);
+					String sqlCounter = "COUNTER" + i;
+					scoreCounter = rs.getInt(sqlCounter);
+					double average = 0;
+					if (scoreCounter != 0) {
+						average = (double) totalScore / scoreCounter;
+					}
+					innerReport.add(String.valueOf(String.format("%.1f", average)));
+					innerReport.add(String.valueOf(scoreCounter));
+				}
+				userCounter++;
+				gradeCounter++;
+
+				report.add(innerReport);
+
+			}
+
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return report;
 	}
 
 	public void getTestResults(String username, int grade, int newScore) {
