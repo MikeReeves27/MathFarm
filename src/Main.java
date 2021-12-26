@@ -51,7 +51,9 @@ public class Main {
 	private JPanel adminLoginPanel;
 	private JPanel adminHomePanel;
 	private JPanel adminAddUserPanel;
+	private JPanel adminDeleteUserPanel;
 	private JPanel adminReportsPanel;
+	private JPanel adminPasswordPanel;
 	private JPanel badgePanel;
 	private JPanel homePanel;
 	private JPanel gradePanel;
@@ -68,6 +70,7 @@ public class Main {
 	int FRAME_HEIGHT_BUFFER;
 
 	private JLabel backgroundLabel;
+	private JLabel title;
 
 	// Global ints for user's test score
 	private int testScore = 0;
@@ -169,17 +172,20 @@ public class Main {
 
 		// addHeading("MATHFARM");
 
-		JLabel heading = new JLabel();
-		heading.setVerticalAlignment(SwingConstants.CENTER);
-		heading.setHorizontalAlignment(SwingConstants.CENTER);
-		heading.setFont(new Font("Calibri", Font.PLAIN, (headerPanel.getHeight() - PRIMARY_RATIO) / 3));
-		heading.setBackground(Color.YELLOW);
-		heading.setText("MATH FARM");
-		heading.setBounds(headerPanel.getWidth() / 4, 0, headerPanel.getWidth() / 2,
-				headerPanel.getHeight() - PRIMARY_RATIO);
-		heading.setOpaque(true);
-		heading.setBorder(raisedbevel);
-		frame.getContentPane().add(heading);
+		title = new JLabel();
+
+		// Set background to same size as frame, minus buffer to account for external
+		// frame edge region
+		int titleWidth = frame.getWidth() - FRAME_WIDTH_BUFFER - PRIMARY_RATIO * 6;
+		title.setBounds((frame.getWidth() - titleWidth) / 2, PRIMARY_RATIO, titleWidth,
+				(int) ((frame.getWidth() - FRAME_WIDTH_BUFFER - PRIMARY_RATIO * 6) / 5.32));
+		frame.getContentPane().add(title);
+
+		// Set background image to same size as backgroundLabel
+		Image titleImage = new ImageIcon(this.getClass().getResource("/title.png")).getImage()
+				.getScaledInstance(title.getWidth(), title.getHeight(), java.awt.Image.SCALE_SMOOTH);
+		frame.getContentPane().setLayout(null);
+		title.setIcon(new ImageIcon(titleImage));
 
 		JLabel loginUsername = new JLabel("USERNAME:");
 		loginUsername.setHorizontalAlignment(SwingConstants.CENTER);
@@ -244,6 +250,7 @@ public class Main {
 				String uid = loginUsernameField.getText();
 				String pwd = String.valueOf(loginPasswordField.getPassword());
 				isUserLoggedIn = login.login(loginUsernameField.getText(), pwd);
+				loginButton.setBackground(new Color(GREEN_RGB[0], GREEN_RGB[1], GREEN_RGB[2]));
 				if (uid.equals("") || pwd.equals("") || !isUserLoggedIn) {
 					error.setVisible(true);
 					return;
@@ -252,7 +259,7 @@ public class Main {
 					createHomePanel();
 					headerPanel.setVisible(true);
 					error.setVisible(false);
-					heading.setVisible(false);
+					title.setVisible(false);
 					loginUsernameField.setText(null);
 					loginPasswordField.setText(null);
 					switchPanel(homePanel);
@@ -263,15 +270,13 @@ public class Main {
 
 		JButton adminButton = new JButton();
 		loginPanel.add(adminButton);
-		createButton(adminButton, loginPanel.getWidth() - 100, loginPanel.getHeight() - 100, 50, 50, GREEN_RGB,
-				"/circle.png", loginPanel.getHeight() - PRIMARY_RATIO, loginPanel.getHeight() - PRIMARY_RATIO, false);
+		int[] ADMIN_RGB = { 28, 138, 219 };
+		createButton(adminButton, loginPanel.getWidth() - 100, loginPanel.getHeight() - 100, 75, 75, ADMIN_RGB,
+				"/admin.png", 75, 75, false);
 
 		adminButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
-				// createAccount();
-				// resetForm();
-				// loginPanel.setVisible(false);
-				heading.setVisible(false);
+				title.setVisible(false);
 				error.setVisible(false);
 				createAdminLoginPanel();
 				switchPanel(adminLoginPanel);
@@ -352,9 +357,8 @@ public class Main {
 					return;
 				} else {
 					createAdminHomePanel();
-					// headerPanel.setVisible(true);
+					username = uid;
 					error.setVisible(false);
-					// heading.setVisible(false);
 					loginUsernameField.setText(null);
 					loginPasswordField.setText(null);
 					loginButton.setBackground(new Color(GRAY_BUTTON[0], GRAY_BUTTON[1], GRAY_BUTTON[2]));
@@ -374,6 +378,7 @@ public class Main {
 			public void actionPerformed(ActionEvent e1) {
 				backgroundLabel.setVisible(true);
 				backButton.setBackground(new Color(GRAY_BUTTON[0], GRAY_BUTTON[1], GRAY_BUTTON[2]));
+				title.setVisible(true);
 				switchPanel(loginPanel);
 			}
 		});
@@ -402,12 +407,20 @@ public class Main {
 			}
 		});
 
-		JButton viewUsersButton = new JButton("View/Edit users");
-		adminHomePanel.add(viewUsersButton);
-		createButton(viewUsersButton, adminHomePanel.getWidth() / 2 + PRIMARY_RATIO,
+		JButton deleteUserButton = new JButton("Delete user");
+		adminHomePanel.add(deleteUserButton);
+		createButton(deleteUserButton, adminHomePanel.getWidth() / 2 + PRIMARY_RATIO,
 				adminHomePanel.getHeight() / 2 - PRIMARY_RATIO * 3, adminHomePanel.getWidth() / 5, PRIMARY_RATIO * 2,
 				GRAY_BUTTON, null, 1, 1, true);
-		viewUsersButton.setFont(new Font("Calibri", Font.PLAIN, viewUsersButton.getHeight() / 3));
+		deleteUserButton.setFont(new Font("Calibri", Font.PLAIN, deleteUserButton.getHeight() / 3));
+
+		deleteUserButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				createAdminDeleteUserPanel();
+				deleteUserButton.setBackground(new Color(GRAY_BUTTON[0], GRAY_BUTTON[1], GRAY_BUTTON[2]));
+				switchPanel(adminDeleteUserPanel);
+			}
+		});
 
 		JButton viewReportsButton = new JButton("View reports");
 		adminHomePanel.add(viewReportsButton);
@@ -431,6 +444,14 @@ public class Main {
 				1, true);
 		changePasswordButton.setFont(new Font("Calibri", Font.PLAIN, changePasswordButton.getHeight() / 3));
 
+		changePasswordButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				createAdminPasswordPanel();
+				changePasswordButton.setBackground(new Color(GRAY_BUTTON[0], GRAY_BUTTON[1], GRAY_BUTTON[2]));
+				switchPanel(adminPasswordPanel);
+			}
+		});
+
 		JButton logoutButton = new JButton("Log out");
 		adminHomePanel.add(logoutButton);
 		createButton(logoutButton, adminHomePanel.getWidth() / 2 - adminHomePanel.getWidth() / 10,
@@ -443,6 +464,7 @@ public class Main {
 				switchPanel(loginPanel);
 				logoutButton.setBackground(new Color(GRAY_BUTTON[0], GRAY_BUTTON[1], GRAY_BUTTON[2]));
 				backgroundLabel.setVisible(true);
+				title.setVisible(true);
 			}
 		});
 
@@ -456,9 +478,11 @@ public class Main {
 		adminAddUserPanel.setBackground(SystemColor.menu);
 		adminAddUserPanel.setLayout(null);
 
-		JLabel error = new JLabel("Please enter valid data!");
-		error.setBounds(adminAddUserPanel.getWidth() / 3, 150, 450, 50);
+		JLabel error = new JLabel("");
+		error.setBounds(adminAddUserPanel.getWidth() / 2 - adminAddUserPanel.getWidth() / 5 + PRIMARY_RATIO,
+				PRIMARY_RATIO * 3, adminAddUserPanel.getWidth() / 5 * 2, PRIMARY_RATIO * 2);
 		error.setFont(new Font("Calibri", Font.PLAIN, 20));
+		error.setHorizontalAlignment(SwingConstants.CENTER);
 		error.setForeground(Color.RED);
 		error.setOpaque(true);
 		error.setBorder(raisedbevel);
@@ -576,8 +600,17 @@ public class Main {
 
 		createUser.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
-				login.addUser(username.getText(), password.getText(), fName.getText(), lName.getText(), grade.getText(),
-						dob.getText(), grantAdminAccess.isSelected());
+				if (username.getText().equals("") || password.getText().equals("") || fName.getText().equals("")
+						|| lName.getText().equals("") || grade.getText().equals("") || dob.getText().equals("")) {
+					error.setText("Please enter valid data!");
+					error.setVisible(true);
+				} else {
+					login.addUser(username.getText(), password.getText(), fName.getText(), lName.getText(),
+							grade.getText(), dob.getText(), grantAdminAccess.isSelected());
+					error.setText("User created!");
+					error.setVisible(true);
+				}
+
 			}
 		});
 
@@ -586,6 +619,74 @@ public class Main {
 		createButton(backButton, adminAddUserPanel.getWidth() / 2 - adminAddUserPanel.getWidth() / 5,
 				adminAddUserPanel.getHeight() / 2 + PRIMARY_RATIO * 3,
 				adminAddUserPanel.getWidth() / 5 - PRIMARY_RATIO / 2, PRIMARY_RATIO * 2, GRAY_BUTTON, null, 1, 1, true);
+		backButton.setFont(new Font("Calibri", Font.PLAIN, backButton.getHeight() / 3));
+
+		backButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				error.setVisible(false);
+				switchPanel(adminHomePanel);
+			}
+		});
+
+	}
+
+	////////// ADMIN DELETE USER PANEL //////////
+	public void createAdminDeleteUserPanel() {
+		adminDeleteUserPanel = new JPanel();
+		adminDeleteUserPanel.setBounds(0, 0, layeredPane.getWidth(), layeredPane.getHeight());
+		layeredPane.add(adminDeleteUserPanel);
+		adminDeleteUserPanel.setBackground(SystemColor.menu);
+		adminDeleteUserPanel.setLayout(null);
+
+		final JTable table;
+
+		// Column Names
+		String[] columnNames = { "USERNAME", "FIRST NAME", "LAST NAME", "GRADE", "DOB" };
+
+		ArrayList<ArrayList<String>> users = new ArrayList<ArrayList<String>>();
+		users = login.getAllUsers();
+		String[][] usersData = new String[users.size()][columnNames.length];
+
+		for (int i = 0; i < usersData.length; i++) {
+			for (int j = 0; j < usersData[i].length; j++) {
+				usersData[i][j] = users.get(i).get(j);
+			}
+		}
+
+		// Initializing JTable
+		table = new JTable(usersData, columnNames);
+		table.setBounds(0, 0, adminDeleteUserPanel.getWidth(),
+				adminDeleteUserPanel.getHeight() - adminDeleteUserPanel.getHeight() / 2 + PRIMARY_RATIO * 2);
+		JScrollPane sp = new JScrollPane(table);
+		table.getTableHeader().setPreferredSize(new Dimension(sp.getWidth(), PRIMARY_RATIO));
+		sp.setBounds(0, 0, adminDeleteUserPanel.getWidth(),
+				adminDeleteUserPanel.getHeight() - adminDeleteUserPanel.getHeight() / 2 + PRIMARY_RATIO * 2);
+		adminDeleteUserPanel.add(sp);
+		table.setRowSelectionAllowed(true);
+
+		JButton deleteUser = new JButton("Delete User");
+		createButton(deleteUser, adminDeleteUserPanel.getWidth() / 2 + PRIMARY_RATIO / 2,
+				adminDeleteUserPanel.getHeight() / 2 + PRIMARY_RATIO * 3,
+				adminDeleteUserPanel.getWidth() / 5 - PRIMARY_RATIO / 3, PRIMARY_RATIO * 2, GRAY_BUTTON, null, 1, 1,
+				true);
+		adminDeleteUserPanel.add(deleteUser);
+		deleteUser.setFont(new Font("Calibri", Font.PLAIN, deleteUser.getHeight() / 3));
+
+		deleteUser.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				int row = table.getSelectedRow();
+				login.deleteUser((String) table.getValueAt(row, 0));
+				createAdminDeleteUserPanel();
+				switchPanel(adminDeleteUserPanel);
+			}
+		});
+
+		JButton backButton = new JButton("Back");
+		adminDeleteUserPanel.add(backButton);
+		createButton(backButton, adminDeleteUserPanel.getWidth() / 2 - adminDeleteUserPanel.getWidth() / 5,
+				adminDeleteUserPanel.getHeight() / 2 + PRIMARY_RATIO * 3,
+				adminDeleteUserPanel.getWidth() / 5 - PRIMARY_RATIO / 2, PRIMARY_RATIO * 2, GRAY_BUTTON, null, 1, 1,
+				true);
 		backButton.setFont(new Font("Calibri", Font.PLAIN, backButton.getHeight() / 3));
 
 		backButton.addActionListener(new ActionListener() {
@@ -604,7 +705,7 @@ public class Main {
 		adminReportsPanel.setBackground(SystemColor.menu);
 		adminReportsPanel.setLayout(null);
 
-		JTable table = new JTable();
+		final JTable table;
 
 		// Column Names
 		String[] columnNames = { "<html><b>FIRST<br>NAME", "<html><b>LAST<br>NAME", "<html><b>GRADE",
@@ -643,6 +744,95 @@ public class Main {
 
 		backButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e1) {
+				switchPanel(adminHomePanel);
+			}
+		});
+
+	}
+
+	////////// ADMIN PASSWORD PANEL //////////
+	public void createAdminPasswordPanel() {
+		adminPasswordPanel = new JPanel();
+		adminPasswordPanel.setBounds(0, 0, layeredPane.getWidth(), layeredPane.getHeight());
+		layeredPane.add(adminPasswordPanel);
+		adminPasswordPanel.setBackground(SystemColor.menu);
+		adminPasswordPanel.setLayout(null);
+
+		JLabel error = new JLabel("");
+		error.setBounds(adminPasswordPanel.getWidth() / 2 - adminPasswordPanel.getWidth() / 5, 0,
+				adminPasswordPanel.getWidth() / 5 * 2, PRIMARY_RATIO * 2);
+		error.setFont(new Font("Calibri", Font.PLAIN, 20));
+		error.setHorizontalAlignment(SwingConstants.CENTER);
+		error.setForeground(Color.RED);
+		error.setOpaque(true);
+		error.setBorder(raisedbevel);
+		adminPasswordPanel.add(error);
+		error.setVisible(false);
+
+		JLabel lblPassword1 = new JLabel("Enter new password:");
+		lblPassword1.setBounds(
+				adminLoginPanel.getWidth() / 2 - ((adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3) / 3 * 2)
+						- PRIMARY_RATIO / 2,
+				PRIMARY_RATIO * 3, adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3, PRIMARY_RATIO);
+		adminPasswordPanel.add(lblPassword1);
+		lblPassword1.setFont(new Font("Calibri", Font.PLAIN, lblPassword1.getHeight() / 2));
+
+		JLabel lblPassword2 = new JLabel("Repeat new password:");
+		lblPassword2.setBounds(
+				adminLoginPanel.getWidth() / 2 - ((adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3) / 3 * 2)
+						- PRIMARY_RATIO / 2,
+				lblPassword1.getY() + PRIMARY_RATIO + PRIMARY_RATIO / 3,
+				(adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3) / 3 * 2, PRIMARY_RATIO);
+		adminPasswordPanel.add(lblPassword2);
+		lblPassword2.setFont(new Font("Calibri", Font.PLAIN, lblPassword2.getHeight() / 2));
+
+		JTextField password1 = new JPasswordField();
+		password1.setBounds(adminHomePanel.getWidth() / 2 + PRIMARY_RATIO / 2, PRIMARY_RATIO * 3,
+				adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3, PRIMARY_RATIO);
+		adminPasswordPanel.add(password1);
+		password1.setColumns(20);
+
+		JTextField password2 = new JPasswordField();
+		password2.setBounds(adminHomePanel.getWidth() / 2 + PRIMARY_RATIO / 2,
+				password1.getY() + PRIMARY_RATIO + PRIMARY_RATIO / 3,
+				adminLoginPanel.getWidth() / 5 - PRIMARY_RATIO / 3, PRIMARY_RATIO);
+		adminPasswordPanel.add(password2);
+
+		JButton changePassword = new JButton("Change password");
+		createButton(changePassword, adminPasswordPanel.getWidth() / 2 + PRIMARY_RATIO / 2,
+				adminPasswordPanel.getHeight() / 2 + PRIMARY_RATIO * 3,
+				adminPasswordPanel.getWidth() / 5 - PRIMARY_RATIO / 3, PRIMARY_RATIO * 2, GRAY_BUTTON, null, 1, 1,
+				true);
+		adminPasswordPanel.add(changePassword);
+		changePassword.setFont(new Font("Calibri", Font.PLAIN, changePassword.getHeight() / 3));
+
+		changePassword.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				if (password1.getText().equals("") || password2.getText().equals("")) {
+					error.setText("Please enter a valid password!");
+					error.setVisible(true);
+				} else if (!password1.getText().equals(password2.getText())) {
+					error.setText("Passwords do not match!");
+					error.setVisible(true);
+				} else {
+					login.updatePassword(username, password1.getText());
+					error.setText("Password successfully changed!");
+					error.setVisible(true);
+				}
+			}
+		});
+
+		JButton backButton = new JButton("Back");
+		adminPasswordPanel.add(backButton);
+		createButton(backButton, adminPasswordPanel.getWidth() / 2 - adminPasswordPanel.getWidth() / 5,
+				adminPasswordPanel.getHeight() / 2 + PRIMARY_RATIO * 3,
+				adminPasswordPanel.getWidth() / 5 - PRIMARY_RATIO / 2, PRIMARY_RATIO * 2, GRAY_BUTTON, null, 1, 1,
+				true);
+		backButton.setFont(new Font("Calibri", Font.PLAIN, backButton.getHeight() / 3));
+
+		backButton.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e1) {
+				error.setVisible(false);
 				switchPanel(adminHomePanel);
 			}
 		});
@@ -800,6 +990,7 @@ public class Main {
 
 				panelCounter = 0;
 				headerPanel.setVisible(false);
+				title.setVisible(true);
 				switchPanel(loginPanel);
 
 			}
@@ -863,8 +1054,6 @@ public class Main {
 		panelList[panelCounter] = homePanel;
 		panelTitle[panelCounter] = "CHOOSE YOUR GRADE";
 		headerLabel.setText(panelTitle[panelCounter]);
-
-		// login.getTestResults(username, 0, 0);
 
 		// Array for each home panel animal button
 		JButton[] homePanelButtons = new JButton[5];
@@ -951,9 +1140,8 @@ public class Main {
 				{ "<html><center>ADD & <br>SUBTRACT</html>", "<html><center>TIME & <br>MONEY</html>", "MEASURE",
 						"GEOMETRY" },
 				{ "<html><center>MULTIPLY & <br>DIVIDE</html>", "FRACTIONS", "MEASURE", "GEOMETRY" },
-				{ "ARITHMETIC", "FRACTIONS", "MEASURE", "GEOMETRY" } };
+				{ "<html><center>MULTIPLY & <br>DIVIDE</html>", "FRACTIONS", "MEASURE", "GEOMETRY" } };
 
-		// [This will change. Insert grade images here]
 		String[][] gradePanelImages = {
 				{ "/addSubtractButton.png", "/countButton.png", "/compareButton.png", "/shapesButton.png",
 						"/happyChicken.png" },
@@ -1242,7 +1430,7 @@ public class Main {
 
 			// If test is over, display result
 		} else {
-			testPanelImageLabel.setText(testScore + " / 10");
+			testPanelImageLabel.setText("Your score: " + testScore + " / 10");
 			login.getTestResults(username, gradeSelection, testScore);
 
 			// If user scores successful score, unlocked grade's badge
@@ -1272,49 +1460,85 @@ public class Main {
 		learnLabel.setOpaque(true);
 		learnLabel.setBorder(raisedbevel);
 
-		String[][][] hyperlinks = { {
-
-				{ "https://www.youtube.com/watch?v=mjlsSYLLOSE&t=53s", "https://www.youtube.com/watch?v=rqiu_xcvSk4" },
+		String[][][] hyperlinks = { { // Grade K Learning Links
+				{ "https://www.youtube.com/watch?v=mjlsSYLLOSE&t=53s", "https://www.youtube.com/watch?v=rqiu_xcvSk4",
+						"https://www.youtube.com/watch?v=igcoDFokKzU", "https://www.youtube.com/watch?v=NHI0ePgwlgU" },
 				{ "https://www.youtube.com/watch?v=x6D51-pz2A4", "https://www.youtube.com/watch?v=2X6FSDrWDEo",
-						"https://www.youtube.com/watch?v=UsbZ-1VmNvw", "https://www.youtube.com/watch?v=dihlSqall3k" },
-				{ "https://www.youtube.com/watch?v=ka9zbPcqXBI" },
+						"https://www.youtube.com/watch?v=UsbZ-1VmNvw", "https://www.youtube.com/watch?v=8IxyrEO4i14" },
+				{ "https://www.youtube.com/watch?v=ka9zbPcqXBI", "https://www.youtube.com/watch?v=E34PAOGYRNk&t=45s",
+						"https://www.youtube.com/watch?v=icR_T7v2xZo" },
 				{ "https://www.youtube.com/watch?v=1VBW6rdvRks", "https://www.youtube.com/watch?v=uaUnTxoF4hU",
 						"https://www.youtube.com/watch?v=teif6M9FjHE" } },
-				{ { "https://www.youtube.com/watch?v=bGetqbqDVaA", "https://www.youtube.com/watch?v=3iQqmmG8wQQ" },
+
+				{ // Grade 1 Learning Links
+						{ "https://www.youtube.com/watch?v=wiGEEJLLKd8", "https://www.youtube.com/watch?v=bGetqbqDVaA",
+								"https://www.youtube.com/watch?v=-gmEe0-_ex8",
+								"https://www.youtube.com/watch?v=3iQqmmG8wQQ" },
 						{ "https://www.youtube.com/watch?v=xdR7s8mwyp8", "https://www.youtube.com/watch?v=9p_Ca_Yb0zQ",
 								"https://www.youtube.com/watch?v=pnXJGNo08v0",
 								"https://www.youtube.com/watch?v=djwclHApLFo" },
-						{ "COMPARE" }, { "SHAPES" } },
-				{ { "ADD SUBTRACT" }, { "TIME MONEY" }, { "MEASURE" },
+						{ "https://www.youtube.com/watch?v=Qn87cKHa7v4",
+								"https://www.youtube.com/watch?v=Qn87cKHa7v4&t=111s" },
+						{ "https://www.youtube.com/watch?v=uaUnTxoF4hU", "https://www.youtube.com/watch?v=Ux_kLd7qAcY" }
+
+				}, { // Grade 2 Learning Links
+						{ "https://www.youtube.com/watch?v=Q9sLfMrH8_w", "https://www.youtube.com/watch?v=VPsYRPdlIpU",
+								"https://www.youtube.com/watch?v=qKxQ33KcRWQ",
+								"https://www.youtube.com/watch?v=ySkjVZ0ym7k" },
+						{ "https://www.youtube.com/watch?v=bZY8WNMRcQ8", "https://www.youtube.com/watch?v=XvrPpRMsQm4",
+								"https://www.youtube.com/watch?v=TnSj6QCnX1o" },
+						{ "https://www.youtube.com/watch?v=GjNsvSHYK98",
+								"https://www.youtube.com/watch?v=H9w8WRr8034" },
 						{ "https://www.youtube.com/watch?v=w27TpLQexbc",
 								"https://www.youtube.com/watch?v=guNdJ5MtX1A" } },
-				{ { "https://www.youtube.com/watch?v=IwW0GJWKH98" },
+				{ // Grade 3 Learning Links
+						{ "https://www.youtube.com/watch?v=IwW0GJWKH98", "https://www.youtube.com/watch?v=LD4zp8ruvaI",
+								"https://www.youtube.com/watch?v=EgjCLhoI9Mk",
+								"https://www.youtube.com/watch?v=CFDCG1b4ahk" },
 						{ "https://www.youtube.com/watch?v=p33BYf1NDAE", "https://www.youtube.com/watch?v=KlfxIbO-KJs",
 								"https://www.youtube.com/watch?v=SZaXtOHNh6s" },
-						{ "MEASURE" }, { "GEOMETRY" } },
-				{ { "ARITHMETIC" }, { "FRACTIONS" }, { "MEASURE" }, { "GEOMETRY" } } };
+						{ "https://www.youtube.com/watch?v=Iu6YaZoh4ec",
+								"https://www.youtube.com/watch?v=tuBLuIW1U70" },
+						{ "https://www.youtube.com/watch?v=kQETZgv04BI", "https://www.youtube.com/watch?v=Sj6PH7kKX2U",
+								"https://www.youtube.com/watch?v=DUGkQMLowXA" } },
+				{ // Grade 4 Learning Links
+						{ "https://www.youtube.com/watch?v=DkM1krQfESM",
+								"https://www.youtube.com/watch?v=IwW0GJWKH98&t=458s",
+								"https://www.youtube.com/watch?v=a1zBdLQgNZ4",
+								"https://www.youtube.com/watch?v=gjqxhtjyfC4" },
+						{ "https://www.youtube.com/watch?v=p33BYf1NDAE&t=239s",
+								"https://www.youtube.com/watch?v=DnFrOetuUKg",
+								"https://www.youtube.com/watch?v=yT1WuyxTCmo&t=23s" },
+						{ "https://www.youtube.com/watch?v=VejB7iT0Wzs",
+								"https://www.youtube.com/watch?v=VzW2sdCe228" },
+						{ "https://www.youtube.com/watch?v=lBCIGY3dWXQ",
+								"https://www.youtube.com/watch?v=10dTx1Zy_4w" } } };
 
-		String[][][] videoName = {
-				{ { "Basic Math Addition", "Subtractions for kids" },
-						{ "Count 1 to 10", "What Number is Missing", "Farm Animal Counting",
-								"Learn to count with Number Farm" },
-						{ "The Greater Than Less Than Song" },
-						{ "Learn Shapes With Wooden Toy Truck", "Shape Song", "Learn Shapes for Kids" } },
-				{ { "Big Numbers Song", "Even and Odd Numbers for Kids" },
-						{ "Easy Time", "Telling the Time for Kids", "The Money Song", "Money & Making Change" },
-						{ "COMPARE" }, { "SHAPES" } },
-				{ { "ADD SUBTRACT" }, { "TIME MONEY" }, { "MEASURE" }, { "Learn About 3D Shapes", "3D Shapes Song" } },
-				{ { "What is Arithmetic?" },
-						{ "Fractions for Kids", "Equivalent Fractions", "Fractions on a Number Line Song" },
-						{ "MEASURE" }, { "GEOMETRY" } },
-				{ { "ARITHMETIC" }, { "FRACTIONS" }, { "MEASURE" }, { "GEOMETRY" } } };
+		String[][][] videoName = { { // Grade K Learning Links Title
+				{ "Addition", "Subtraction", "Add & Subtract with Dinosaurs", "Addition Song" },
+				{ "Count 1 to 10", "Missing Number", "Farm Animal Counting", "Interactive Counting Song" },
+				{ "Compare Song", "Compare Numbers", "Compare Quantities" },
+				{ "Shapes", "Shapes Song", "Shapes - Sing, Dance & Learn" } },
 
-		// Creating Hyper links
-//		String[] hyperlinks = { "https://www.youtube.com/watch?v=mvOkMYCygps&ab_channel=KhanAcademy",
-//				"https://www.youtube.com/watch?v=MTzTqvzWzm8&ab_channel=KhanAcademy",
-//				"https://www.youtube.com/watch?v=i6sbjtJjJ-A&ab_channel=TheOrganicChemistryTutor",
-//				"https://www.youtube.com/watch?v=sOE8Slo3Pqw&ab_channel=ScienceandMathsbyPrimroseKitten" };
-		// "https://www.youtube.com/watch?v=Vuj5CZDy-Pc&ab_channel=MathandScience" };
+				{ // Grade 1 Learning Links Title
+						{ "Count 1-20", "Count 1-100", "Count By 10's", "Even and Odd Numbers" },
+						{ "Time", "Half Past Time", "The Money Song", "Count Money & Make Change" },
+						{ "Compare", "Compare Numbers" }, { "Shapes Song", "Shapes Movie" } },
+
+				{ // Grade 2 Learning Links Title
+						{ "2 Digit Addition", "Addition Using Regrouping", "2 Digit Subtraction", "Subtraction" },
+						{ "Time", "Quarter Past Times", "Money" }, { "Measure Song", "Measure With a Ruler" },
+						{ "3D Shapes", "3D Shapes Song" } },
+
+				{ // Grade 3 Learning Links Title
+						{ "Arithmetic Introduction", "Multiplication", "Multiplication MashUp", "Add In groups" },
+						{ "Fractions", "Equivalent Fractions", "Fractions on a Number Line Song" },
+						{ "Measurements", "How To Measure" }, { "Angles", "Geometry Introduction", "Polygons" } },
+
+				{ // Grade 4 Learning Links Title
+						{ "HipHop Math", "Arithmetic", "Multiplication", "Division" },
+						{ "Fractions", "Fractions Song", "Basic Fractions" }, { "Measurement Concepts", "Measurement" },
+						{ "Geometry", "Shapes" } } };
 
 		int linkButtonHeight = learnLabel.getHeight() / 5;
 		int linkButtonYCoordinate = linkButtonHeight / 5;
@@ -1366,23 +1590,29 @@ public class Main {
 		String[][][] activityImages = {
 				{ { "/plusSign.png", "/minusSign.png" }, { "/howMany.png", "/nextSequence.png" }, { "/compare.png" },
 						{ "/shapes.png" } },
-				{ { "/plusSign.png", "/minusSign.png" }, { "/clock100.png" }, { /* COMPARE */ }, { "/shapes.png" } },
-				{ { "/plusSign.png", "/minusSign.png" }, { "/calendar.png" }, { /* MEASURE */ }, { /* GEOMETRY */ } },
-				{ { "/multiplicationSign.png", "/divisionSign.png" }, { "/pizza23.png" }, { /* MEASURE */ },
-						{ /* GEOMETRY */ } },
+				{ { "/plusSign.png", "/minusSign.png" }, { "/clock100.png", "/quarter.png" }, { "/compare.png" },
+						{ "/shapes.png" } },
+				{ { "/plusSign.png", "/minusSign.png" }, { "/calendar.png", "/quarter.png" }, { "/8 inches.png" },
+						{ "/shapes3d.png", "/angles.png" } },
+				{ { "/multiplicationSign.png", "/divisionSign.png" }, { "/pizza23.png" }, { "/8 inches.png" },
+						{ "/shapes3d.png", "/angles.png" } },
 				{ { "/multiplicationSign.png", "/divisionSign.png" }, { "/fractionEquivalences.png" },
-						{ /* MEASURE */ }, { /* GEOMETRY */ } } };
+						{ "/tapeMeasure.png" }, { "/shapes3d.png", "/angles.png" } } };
 		double[][][] activityImageRatios = { { { 1.0, 2.0 }, { 0.93, 3.92 }, { 0.62 }, { 0.93 } },
-				{ { 1.0, 2.0 }, { 1.0 }, { /* COMPARE */ }, { 0.93 } },
-				{ { 1.0, 2.0 }, { 1.18 }, { /* MEASURE */ }, { /* GEOMETRY */ } },
-				{ { 1.0, 1.0 }, { 1.0 }, { /* MEASURE */ }, { /* GEOMETRY */ } },
-				{ { 1.0, 1.0 }, { 1.48 }, { /* MEASURE */ }, { /* GEOMETRY */ } } };
+				{ { 1.0, 2.0 }, { 1.0, 1.0 }, { 0.62 }, { 0.93 } },
+				{ { 1.0, 2.0 }, { 1.18, 1.0 }, { 1.86 }, { 0.93, 1.0 } },
+				{ { 1.0, 1.0 }, { 1.0 }, { 1.86 }, { 0.93, 1.0 } },
+				{ { 1.0, 1.0 }, { 1.48 }, { 2.29 }, { 0.93, 1.0 } } };
 		String[][][] activityText = {
 				{ { "ADD", "SUBTRACT" }, { "HOW MANY", "WHAT'S NEXT" }, { "COMPARE" }, { "NAME THE SHAPE" } },
-				{ { "ADD", "SUBTRACT" }, { "WHAT TIME" }, { /* COMPARE */ }, { "NAME THE SHAPE" } },
-				{ { "ADD", "SUBTRACT" }, { "HOW MUCH TIME" }, { /* MEASURE */ }, { /* GEOMETRY */ } },
-				{ { "MULTIPLY", "DIVIDE" }, { "PIZZA FRACTIONS" }, { /* MEASURE */ }, { /* GEOMETRY */ } },
-				{ { "MULTIPLY", "DIVIDE" }, { "FRACTIONS" }, { /* MEASURE */ }, { /* GEOMETRY */ } } };
+				{ { "ADD", "SUBTRACT" }, { "WHAT TIME", "HOW MUCH MONEY" }, { "COMPARE" },
+						{ "NAME THE SHAPE", "NAME THE ANGLE" } },
+				{ { "ADD", "SUBTRACT" }, { "HOW MUCH TIME", "HOW MUCH MONEY" },
+						{ "<html><center>WHAT'S THE<br>LENGTH" }, { "NAME THE SHAPE", "NAME THE ANGLE" } },
+				{ { "MULTIPLY", "DIVIDE" }, { "PIZZA FRACTIONS" }, { "<html><center>WHAT'S THE<br>LENGTH" },
+						{ "NAME THE SHAPE", "NAME THE ANGLE" } },
+				{ { "MULTIPLY", "DIVIDE" }, { "FRACTIONS" }, { "HOW MANY UNITS" },
+						{ "NAME THE SHAPE", "NAME THE ANGLE" } } };
 
 		JButton[] activityButtons = new JButton[activityImages[gradeSelection][categorySelection].length];
 
@@ -1568,6 +1798,11 @@ public class Main {
 			JLabel practicePanelImageLabel, JLabel practicePanelTextLabel, JButton nextQuestion,
 			JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
 
+		// Set default values for answers, correctAnswerIndex, and null question object
+		String[] answers;
+		int correctAnswerIndex;
+		Question question = null;
+
 		// Switch for grade level (0-4)
 		switch (gradeSelection) {
 
@@ -1665,18 +1900,37 @@ public class Main {
 
 			// Grade 1: Time and Money
 			case 1:
-				createQuestionWhatTime(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
-						practicePanelLabel, practiceOrTestPanel);
+
+				// Switch for activity selection
+				switch (activitySelection) {
+
+				// Grade 1: Time and Money: Time
+				case 0:
+					createQuestionWhatTime(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+							practicePanelLabel, practiceOrTestPanel);
+					break;
+
+				// Grade 1: Time and Money: Money
+				case 1:
+					createQuestionCoinCount(gradeSelection, practicePanelImageLabel, practicePanelTextLabel,
+							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					break;
+				}
 				break;
 
 			// Grade 1: Compare
 			case 2:
-				// ??????
+				// Grade 1: Compare: Compare
+				createQuestionCompare(gradeSelection, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+						practicePanelLabel, practiceOrTestPanel);
 				break;
 
 			// Grade 1: Shapes
 			case 3:
-				// ??????
+				// Grade 1: Shapes: What Shape
+				createQuestionShapes(gradeSelection, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+						practicePanelLabel, practiceOrTestPanel);
+
 				break;
 			}
 			break;
@@ -1709,19 +1963,49 @@ public class Main {
 
 			// Grade 2: Time and Money
 			case 1:
-				createQuestionHowMuchTime(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
-						practicePanelLabel, practiceOrTestPanel);
+				// Switch for activity selection
+				switch (activitySelection) {
+
+				// Grade 2: Time and Money: Time
+				case 0:
+					QuestionHowManyUnits newQuestion = new QuestionHowManyUnits(gradeSelection);
+					question = newQuestion;
+					break;
+
+				// Grade 2: Time and Money: Money
+				case 1:
+					createQuestionCoinCount(gradeSelection, practicePanelImageLabel, practicePanelTextLabel,
+							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					break;
+				}
 				break;
 
 			// Grade 2: Measure
 			case 2:
-				// ??????
+				createQuestionMeasure(gradeSelection, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+						practicePanelLabel, practiceOrTestPanel);
 				break;
 
 			// Grade 2: Geometry
 			case 3:
-				// ??????
+
+				// Switch for activity selection
+				switch (activitySelection) {
+
+				// Grade 2: Geometry: 3D Shapes
+				case 0:
+					createQuestionGeoShapes(gradeSelection, practicePanelImageLabel, practicePanelTextLabel,
+							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					break;
+
+				// Grade 2: Geometry: Angles
+				case 1:
+					createQuestionGeoAngles(gradeSelection, practicePanelImageLabel, practicePanelTextLabel,
+							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					break;
+				}
 				break;
+
 			}
 			break;
 
@@ -1758,12 +2042,27 @@ public class Main {
 
 			// Grade 3: Measure
 			case 2:
-				// ??????
+				createQuestionMeasure(gradeSelection, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
+						practicePanelLabel, practiceOrTestPanel);
 				break;
 
 			// Grade 3: Geometry
 			case 3:
-				// ??????
+				// Switch for activity selection
+				switch (activitySelection) {
+
+				// Grade 3: Geometry: 3D Shapes
+				case 0:
+					createQuestionGeoShapes(gradeSelection, practicePanelImageLabel, practicePanelTextLabel,
+							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					break;
+
+				// Grade 3: Geometry: Angles
+				case 1:
+					createQuestionGeoAngles(gradeSelection, practicePanelImageLabel, practicePanelTextLabel,
+							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					break;
+				}
 				break;
 			}
 			break;
@@ -1801,16 +2100,41 @@ public class Main {
 
 			// Grade 4: Measure
 			case 2:
-				// ??????
+				QuestionHowManyUnits newQuestion = new QuestionHowManyUnits(gradeSelection);
+				question = newQuestion;
 				break;
 
 			// Grade 4: Geometry
 			case 3:
-				// ??????
+
+				// Switch for activity selection
+				switch (activitySelection) {
+
+				// Grade 4: Geometry: 3D Shapes
+				case 0:
+					createQuestionGeoShapes(gradeSelection, practicePanelImageLabel, practicePanelTextLabel,
+							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					break;
+
+				// Grade 4: Geometry: Angles
+				case 1:
+					createQuestionGeoAngles(gradeSelection, practicePanelImageLabel, practicePanelTextLabel,
+							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+					break;
+				}
 				break;
 			}
 			break;
 		}
+
+		question.generateQuestion();
+		answers = question.getAnswers();
+		correctAnswerIndex = question.getCorrectAnswerIndex();
+		practicePanelImageLabel.setText(question.getQuestionText());
+		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 4));
+
+		// Create answer buttons
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
 	}
 
 	////////// QUESTION: GRADE K-4: ADDITION, SUBTRACTION, MULTIPLICATION, DIVISION
@@ -1832,7 +2156,7 @@ public class Main {
 		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 2));
 
 		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
 	}
 
 	////////// QUESTION: GRADE K: CHOOSE HOW MANY ANIMALS THERE ARE //////////
@@ -1892,7 +2216,7 @@ public class Main {
 		}
 
 		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
 	}
 
 	////////// QUESTION: GRADE K: CHOOSE NEXT NUMBER IN THE SEQUENCE //////////
@@ -1908,7 +2232,7 @@ public class Main {
 		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 3));
 
 		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
 	}
 
 	////////// QUESTION: GRADE K-1: Compare two numbers //////////
@@ -1924,7 +2248,7 @@ public class Main {
 		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 3));
 
 		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
 
 	}
 
@@ -1933,7 +2257,7 @@ public class Main {
 			JButton nextQuestion, JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
 
 		// Create new Compare object
-		Shapes shapes = new Shapes(0);
+		Shapes shapes = new Shapes(gradeSelection);
 		practicePanelTextLabel.setText(shapes.getQuestionText());
 		String[] answers = shapes.getAnswers();
 		int correctAnswerIndex = shapes.getCorrectAnswerIndex();
@@ -1941,11 +2265,12 @@ public class Main {
 		int imageHeight = practicePanelImageLabel.getHeight();
 
 		Image questionImage = new ImageIcon(this.getClass().getResource(shapes.getImage())).getImage()
-				.getScaledInstance(imageHeight, imageHeight, java.awt.Image.SCALE_SMOOTH);
+				.getScaledInstance((int) (imageHeight * shapes.getImageRatio()), imageHeight,
+						java.awt.Image.SCALE_SMOOTH);
 		practicePanelImageLabel.setIcon(new ImageIcon(questionImage));
 
 		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
 
 	}
 
@@ -1962,20 +2287,124 @@ public class Main {
 		practicePanelImageLabel.setIcon(new ImageIcon(questionImage));
 
 		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
 	}
 
-	////////// QUESTION: GRADE 2: HOW MUCH TIME //////////
-	public void createQuestionHowMuchTime(JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
-			JButton nextQuestion, JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
-		HowMuchTime howMuchTime = new HowMuchTime();
-		String[] answers = howMuchTime.getAnswers();
-		int correctAnswerIndex = howMuchTime.getCorrectAnswerIndex();
-		practicePanelImageLabel.setText(howMuchTime.getQuestionText());
-		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 4));
+	////////// QUESTION: CoinCount
+	public void createQuestionCoinCount(int gradeSelection, JLabel practicePanelImageLabel,
+			JLabel practicePanelTextLabel, JButton nextQuestion, JLabel practicePanelLabel,
+			JPanel practiceOrTestPanel) {
+
+		// Create new CoinCount
+		CoinCount coincount = new CoinCount(1);
+		practicePanelTextLabel.setText(coincount.getQuestionText());
+		String[] answers = coincount.getAnswers();
+		int correctAnswer = coincount.getCorrectAnswer();
+		int correctAnswerIndex = coincount.getCorrectAnswerIndex();
+		int imageWidth = 0;
+		int imageHeight = 0;
+
+		// Create one sub panel for each coin
+		JLabel[] practicePanelSubImage = new JLabel[correctAnswer];
+
+		// Set image sizes based on panel. If the total number of images and width goes
+		// beyond panel boundaries, resize all images to auto-fit
+		double imageSize = practicePanelImageLabel.getHeight();
+		int xImageCoordinate;
+		int yImageCoordinate = 0;
+		if (imageSize * correctAnswer > practicePanelImageLabel.getWidth()) {
+			imageSize = (practicePanelImageLabel.getWidth() / (imageSize * correctAnswer) * imageSize);
+			xImageCoordinate = 0;
+			yImageCoordinate = (int) (practicePanelImageLabel.getHeight() - imageSize) / 2;
+		} else {
+			xImageCoordinate = (int) ((practicePanelImageLabel.getWidth() - imageSize * correctAnswer)
+					/ (correctAnswer + 1));
+		}
+
+		// Create sub panels and draw all coin images
+		for (int i = 0; i < coincount.getImageNames().length; i++) {
+			imageWidth = coincount.getImageWidths()[i];
+			imageHeight = coincount.getImageHeights()[i];
+			practicePanelSubImage[i] = new JLabel();
+			practicePanelSubImage[i].setOpaque(false);
+			practicePanelSubImage[i].setBounds(xImageCoordinate, yImageCoordinate, coincount.getImageWidths()[i],
+					coincount.getImageWidths()[i]);
+			xImageCoordinate += (int) ((practicePanelImageLabel.getWidth()
+					- coincount.getImageWidths()[i] * coincount.getImageNames().length)
+					/ (coincount.getImageNames().length + 1)) + coincount.getImageWidths()[i];
+			practicePanelImageLabel.add(practicePanelSubImage[i]);
+			practicePanelSubImage[i].setHorizontalAlignment(SwingConstants.CENTER);
+			practicePanelSubImage[i].setVerticalAlignment(SwingConstants.CENTER);
+			Image questionImage = new ImageIcon(this.getClass().getResource(coincount.getImageNames()[i] + ".png"))
+					.getImage().getScaledInstance(imageWidth, imageHeight, java.awt.Image.SCALE_SMOOTH);
+			practicePanelSubImage[i].setIcon(new ImageIcon(questionImage));
+		}
 
 		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
+	}
+
+	////////// QUESTION: GRADE 2-3: HOW LONG IS IT //////////
+	public void createQuestionMeasure(int gradeSelection, JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
+			JButton nextQuestion, JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
+		Measure measure = new Measure(gradeSelection);
+		practicePanelTextLabel.setText(measure.getQuestionText());
+		String[] answers = measure.getAnswers();
+		int correctAnswerIndex = measure.getCorrectAnswerIndex();
+		String img = measure.getImage();
+		Image questionImage = new ImageIcon(this.getClass().getResource(img)).getImage().getScaledInstance(
+				(int) (practicePanelImageLabel.getHeight() * measure.getImageRatio() * 2),
+				practicePanelImageLabel.getHeight() * 2, java.awt.Image.SCALE_SMOOTH);
+		practicePanelImageLabel.setIcon(new ImageIcon(questionImage));
+
+		// Create answer buttons
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
+	}
+
+	////////// QUESTION: GRADE 2-4: Name the 3D shape //////////
+	public void createQuestionGeoShapes(int gradeSelection, JLabel practicePanelImageLabel,
+			JLabel practicePanelTextLabel, JButton nextQuestion, JLabel practicePanelLabel,
+			JPanel practiceOrTestPanel) {
+
+		// Create new Compare object
+		GeoShapes geoShapes = new GeoShapes(gradeSelection);
+		practicePanelTextLabel.setText(geoShapes.getQuestionText());
+		String[] answers = geoShapes.getAnswers();
+		int correctAnswerIndex = geoShapes.getCorrectAnswerIndex();
+		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 3));
+		int imageHeight = practicePanelImageLabel.getHeight();
+
+		Image questionImage = new ImageIcon(this.getClass().getResource(geoShapes.getImage())).getImage()
+				.getScaledInstance((int) (imageHeight * geoShapes.getImageRatio()), imageHeight,
+						java.awt.Image.SCALE_SMOOTH);
+		practicePanelImageLabel.setIcon(new ImageIcon(questionImage));
+
+		// Create answer buttons
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 3);
+
+	}
+
+	////////// QUESTION: GRADE 2-4: Name the angle //////////
+	public void createQuestionGeoAngles(int gradeSelection, JLabel practicePanelImageLabel,
+			JLabel practicePanelTextLabel, JButton nextQuestion, JLabel practicePanelLabel,
+			JPanel practiceOrTestPanel) {
+
+		// Create new Compare object
+		GeoAngles geoAngles = new GeoAngles(gradeSelection);
+		practicePanelTextLabel.setText(geoAngles.getQuestionText());
+		String[] answers = geoAngles.getAnswers();
+		int correctAnswerIndex = geoAngles.getCorrectAnswerIndex();
+		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 3));
+		int imageHeight = practicePanelImageLabel.getHeight();
+
+		Image questionImage = new ImageIcon(this.getClass().getResource(geoAngles.getImage())).getImage()
+				.getScaledInstance((int) (imageHeight * geoAngles.getImageRatio()), imageHeight,
+						java.awt.Image.SCALE_SMOOTH);
+		practicePanelImageLabel.setIcon(new ImageIcon(questionImage));
+
+		// Create answer buttons
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 3);
+
 	}
 
 	////////// QUESTION: GRADE 3: FRACTIONS //////////
@@ -1991,7 +2420,7 @@ public class Main {
 		practicePanelImageLabel.setIcon(new ImageIcon(questionImage));
 
 		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
 	}
 
 	////////// QUESTION: GRADE 4: FRACTIONS //////////
@@ -2005,12 +2434,12 @@ public class Main {
 		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 4));
 
 		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel);
+		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
 	}
 
 	////////// CREATE ANSWER BUTTONS //////////
 	public void createAnswerButtons(String[] answers, JButton nextQuestion, int correctAnswerIndex,
-			JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
+			JLabel practicePanelLabel, JPanel practiceOrTestPanel, int textSize) {
 
 		// Create answer selection Buttons
 		JButton[] answerSelectionButtons = new JButton[3];
@@ -2027,7 +2456,7 @@ public class Main {
 			answerSelectionButtonXCoordinate += layeredPane.getWidth() - PRIMARY_RATIO * 4
 					- (layeredPane.getWidth() / 5 * 3);
 			answerSelectionButtons[i]
-					.setFont(new Font("Calibri", Font.PLAIN, answerSelectionButtons[i].getHeight() / 2));
+					.setFont(new Font("Calibri", Font.PLAIN, answerSelectionButtons[i].getHeight() / textSize));
 			answerSelectionButtons[i].setForeground(Color.white);
 			answerSelectionButtons[i].setBorderPainted(true);
 			answerSelectionButtons[i].setBorder(raisedbevel);
