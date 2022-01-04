@@ -1864,9 +1864,8 @@ public class Main {
 			case 3:
 
 				// Grade K: Shapes: What Shape
-				createQuestionShapes(gradeSelection, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
-						practicePanelLabel, practiceOrTestPanel);
-
+				QuestionSingleImage shapeQuestion = new QuestionSingleImage(gradeSelection, categorySelection);
+				question = shapeQuestion;
 				break;
 
 			}
@@ -1927,10 +1926,10 @@ public class Main {
 
 			// Grade 1: Shapes
 			case 3:
-				// Grade 1: Shapes: What Shape
-				createQuestionShapes(gradeSelection, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
-						practicePanelLabel, practiceOrTestPanel);
 
+				// Grade 1: Shapes: What Shape
+				QuestionSingleImage shapeQuestion = new QuestionSingleImage(gradeSelection, categorySelection);
+				question = shapeQuestion;
 				break;
 			}
 			break;
@@ -1963,13 +1962,14 @@ public class Main {
 
 			// Grade 2: Time and Money
 			case 1:
+
 				// Switch for activity selection
 				switch (activitySelection) {
 
 				// Grade 2: Time and Money: Time
 				case 0:
-					QuestionHowManyUnits newQuestion = new QuestionHowManyUnits(gradeSelection);
-					question = newQuestion;
+					QuestionHowManyUnits shapeQuestion = new QuestionHowManyUnits(gradeSelection);
+					question = shapeQuestion;
 					break;
 
 				// Grade 2: Time and Money: Money
@@ -1992,10 +1992,11 @@ public class Main {
 				// Switch for activity selection
 				switch (activitySelection) {
 
-				// Grade 2: Geometry: 3D Shapes
+				// Grade 2: Geometry: What Shape
 				case 0:
-					createQuestionGeoShapes(gradeSelection, practicePanelImageLabel, practicePanelTextLabel,
-							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+
+					QuestionSingleImage shapeQuestion = new QuestionSingleImage(gradeSelection, categorySelection);
+					question = shapeQuestion;
 					break;
 
 				// Grade 2: Geometry: Angles
@@ -2036,8 +2037,9 @@ public class Main {
 
 			// Grade 3: Fractions
 			case 1:
-				createQuestionFractions(practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
-						practicePanelLabel, practiceOrTestPanel);
+
+				QuestionSingleImage fractionQuestion = new QuestionSingleImage(gradeSelection, categorySelection);
+				question = fractionQuestion;
 				break;
 
 			// Grade 3: Measure
@@ -2053,8 +2055,9 @@ public class Main {
 
 				// Grade 3: Geometry: 3D Shapes
 				case 0:
-					createQuestionGeoShapes(gradeSelection, practicePanelImageLabel, practicePanelTextLabel,
-							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+
+					QuestionSingleImage shapeQuestion = new QuestionSingleImage(gradeSelection, categorySelection);
+					question = shapeQuestion;
 					break;
 
 				// Grade 3: Geometry: Angles
@@ -2100,23 +2103,23 @@ public class Main {
 
 			// Grade 4: Measure
 			case 2:
-				QuestionHowManyUnits newQuestion = new QuestionHowManyUnits(gradeSelection);
-				question = newQuestion;
+				QuestionHowManyUnits measureQuestion = new QuestionHowManyUnits(gradeSelection);
+				question = measureQuestion;
 				break;
 
 			// Grade 4: Geometry
 			case 3:
-
 				// Switch for activity selection
 				switch (activitySelection) {
 
-				// Grade 4: Geometry: 3D Shapes
+				// Grade 3: Geometry: 3D Shapes
 				case 0:
-					createQuestionGeoShapes(gradeSelection, practicePanelImageLabel, practicePanelTextLabel,
-							nextQuestion, practicePanelLabel, practiceOrTestPanel);
+
+					QuestionSingleImage shapeQuestion = new QuestionSingleImage(gradeSelection, categorySelection);
+					question = shapeQuestion;
 					break;
 
-				// Grade 4: Geometry: Angles
+				// Grade 3: Geometry: Angles
 				case 1:
 					createQuestionGeoAngles(gradeSelection, practicePanelImageLabel, practicePanelTextLabel,
 							nextQuestion, practicePanelLabel, practiceOrTestPanel);
@@ -2130,14 +2133,24 @@ public class Main {
 		question.generateQuestion();
 		answers = question.getAnswers();
 		correctAnswerIndex = question.getCorrectAnswerIndex();
-		practicePanelImageLabel.setText(question.getQuestionText());
-		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 4));
+
+		// If question contains an image, display it. Else, display text
+		if (question.getImage() != null) {
+			int imageHeight = practicePanelImageLabel.getHeight();
+			Image questionImage = new ImageIcon(this.getClass().getResource(question.getImage())).getImage()
+					.getScaledInstance((int) (imageHeight * question.getImageRatio()), imageHeight,
+							java.awt.Image.SCALE_SMOOTH);
+			practicePanelImageLabel.setIcon(new ImageIcon(questionImage));
+		} else {
+			practicePanelImageLabel.setText(question.getQuestionText());
+			practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 4));
+		}
 
 		// Create answer buttons
 		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
 	}
 
-	////////// QUESTION: GRADE K-4: ADDITION, SUBTRACTION, MULTIPLICATION, DIVISION
+	////////// QUESTION: GRADE K-4: ADD, SUBTRACTION, MULTIPLICATION, DIVISION
 	////////// //////////
 	public void createArithmetic(int gradeSelection, int operation, JLabel practicePanelImageLabel,
 			JLabel practicePanelTextLabel, JButton nextQuestion, JLabel practicePanelLabel,
@@ -2246,28 +2259,6 @@ public class Main {
 		String[] answers = compare.getAnswers();
 		int correctAnswerIndex = compare.getCorrectAnswerIndex();
 		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 3));
-
-		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
-
-	}
-
-	////////// QUESTION: GRADE K-1: Name the shape //////////
-	public void createQuestionShapes(int gradeSelection, JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
-			JButton nextQuestion, JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
-
-		// Create new Compare object
-		Shapes shapes = new Shapes(gradeSelection);
-		practicePanelTextLabel.setText(shapes.getQuestionText());
-		String[] answers = shapes.getAnswers();
-		int correctAnswerIndex = shapes.getCorrectAnswerIndex();
-		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 3));
-		int imageHeight = practicePanelImageLabel.getHeight();
-
-		Image questionImage = new ImageIcon(this.getClass().getResource(shapes.getImage())).getImage()
-				.getScaledInstance((int) (imageHeight * shapes.getImageRatio()), imageHeight,
-						java.awt.Image.SCALE_SMOOTH);
-		practicePanelImageLabel.setIcon(new ImageIcon(questionImage));
 
 		// Create answer buttons
 		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
@@ -2405,22 +2396,6 @@ public class Main {
 		// Create answer buttons
 		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 3);
 
-	}
-
-	////////// QUESTION: GRADE 3: FRACTIONS //////////
-	public void createQuestionFractions(JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
-			JButton nextQuestion, JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
-		Fractions fractions = new Fractions();
-		practicePanelTextLabel.setText(fractions.getQuestionText());
-		String[] answers = fractions.getAnswers();
-		int correctAnswerIndex = fractions.getCorrectAnswerIndex();
-		String img = fractions.getImage();
-		Image questionImage = new ImageIcon(this.getClass().getResource(img)).getImage().getScaledInstance(
-				practicePanelImageLabel.getHeight(), practicePanelImageLabel.getHeight(), java.awt.Image.SCALE_SMOOTH);
-		practicePanelImageLabel.setIcon(new ImageIcon(questionImage));
-
-		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
 	}
 
 	////////// QUESTION: GRADE 4: FRACTIONS //////////
