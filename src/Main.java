@@ -1982,8 +1982,9 @@ public class Main {
 
 			// Grade 2: Measure
 			case 2:
-				createQuestionMeasure(gradeSelection, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
-						practicePanelLabel, practiceOrTestPanel);
+
+				QuestionSingleImage measureQuestion = new QuestionSingleImage(gradeSelection, categorySelection);
+				question = measureQuestion;
 				break;
 
 			// Grade 2: Geometry
@@ -2044,8 +2045,8 @@ public class Main {
 
 			// Grade 3: Measure
 			case 2:
-				createQuestionMeasure(gradeSelection, practicePanelImageLabel, practicePanelTextLabel, nextQuestion,
-						practicePanelLabel, practiceOrTestPanel);
+				QuestionSingleImage measureQuestion = new QuestionSingleImage(gradeSelection, categorySelection);
+				question = measureQuestion;
 				break;
 
 			// Grade 3: Geometry
@@ -2133,10 +2134,14 @@ public class Main {
 		question.generateQuestion();
 		answers = question.getAnswers();
 		correctAnswerIndex = question.getCorrectAnswerIndex();
+		practicePanelTextLabel.setText(question.getQuestionText());
 
 		// If question contains an image, display it. Else, display text
 		if (question.getImage() != null) {
 			int imageHeight = practicePanelImageLabel.getHeight();
+			if (gradeSelection == 2 && categorySelection == 2 || gradeSelection == 3 && categorySelection == 2) {
+				imageHeight *= 2;
+			}
 			Image questionImage = new ImageIcon(this.getClass().getResource(question.getImage())).getImage()
 					.getScaledInstance((int) (imageHeight * question.getImageRatio()), imageHeight,
 							java.awt.Image.SCALE_SMOOTH);
@@ -2148,6 +2153,10 @@ public class Main {
 
 		// Create answer buttons
 		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
+
+//		Image questionImage = new ImageIcon(this.getClass().getResource(img)).getImage().getScaledInstance(
+//				(int) (practicePanelImageLabel.getHeight() * measure.getImageRatio() * 2),
+//				practicePanelImageLabel.getHeight() * 2, java.awt.Image.SCALE_SMOOTH);
 	}
 
 	////////// QUESTION: GRADE K-4: ADD, SUBTRACTION, MULTIPLICATION, DIVISION
@@ -2333,46 +2342,6 @@ public class Main {
 
 		// Create answer buttons
 		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
-	}
-
-	////////// QUESTION: GRADE 2-3: HOW LONG IS IT //////////
-	public void createQuestionMeasure(int gradeSelection, JLabel practicePanelImageLabel, JLabel practicePanelTextLabel,
-			JButton nextQuestion, JLabel practicePanelLabel, JPanel practiceOrTestPanel) {
-		Measure measure = new Measure(gradeSelection);
-		practicePanelTextLabel.setText(measure.getQuestionText());
-		String[] answers = measure.getAnswers();
-		int correctAnswerIndex = measure.getCorrectAnswerIndex();
-		String img = measure.getImage();
-		Image questionImage = new ImageIcon(this.getClass().getResource(img)).getImage().getScaledInstance(
-				(int) (practicePanelImageLabel.getHeight() * measure.getImageRatio() * 2),
-				practicePanelImageLabel.getHeight() * 2, java.awt.Image.SCALE_SMOOTH);
-		practicePanelImageLabel.setIcon(new ImageIcon(questionImage));
-
-		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 2);
-	}
-
-	////////// QUESTION: GRADE 2-4: Name the 3D shape //////////
-	public void createQuestionGeoShapes(int gradeSelection, JLabel practicePanelImageLabel,
-			JLabel practicePanelTextLabel, JButton nextQuestion, JLabel practicePanelLabel,
-			JPanel practiceOrTestPanel) {
-
-		// Create new Compare object
-		GeoShapes geoShapes = new GeoShapes(gradeSelection);
-		practicePanelTextLabel.setText(geoShapes.getQuestionText());
-		String[] answers = geoShapes.getAnswers();
-		int correctAnswerIndex = geoShapes.getCorrectAnswerIndex();
-		practicePanelImageLabel.setFont(new Font("Calibri", Font.PLAIN, practicePanelImageLabel.getHeight() / 3));
-		int imageHeight = practicePanelImageLabel.getHeight();
-
-		Image questionImage = new ImageIcon(this.getClass().getResource(geoShapes.getImage())).getImage()
-				.getScaledInstance((int) (imageHeight * geoShapes.getImageRatio()), imageHeight,
-						java.awt.Image.SCALE_SMOOTH);
-		practicePanelImageLabel.setIcon(new ImageIcon(questionImage));
-
-		// Create answer buttons
-		createAnswerButtons(answers, nextQuestion, correctAnswerIndex, practicePanelLabel, practiceOrTestPanel, 3);
-
 	}
 
 	////////// QUESTION: GRADE 2-4: Name the angle //////////
