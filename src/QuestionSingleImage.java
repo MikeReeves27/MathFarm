@@ -1,6 +1,8 @@
 // Question class for:
-// Grade 2 Measure: eg, "How many seconds are in a minute?"
-// Grade 4 Measure: eg, "How many grams are in a kilogram?"
+// Grades K-4: "What shape is this?"
+// Grade 1: "What time is it?"
+// Grades 2-3: "How long is it?"
+// Grade 3: "Pizza fractions"
 
 import java.util.Random;
 
@@ -27,27 +29,43 @@ public class QuestionSingleImage extends Question {
 						{ /* Shapes */ "square", "circle", "triangle", "trapezoid", "pentagon", "hexagon",
 								"octagon" } },
 				{ // Grade 2
-						{}, {}, {}, { /* Shapes */ "cube", "sphere", "pyramid", "cone" } },
+						{}, {},
+						{ /* Measure */ "1 inch", "2 inches", "3 inches", "4 inches", "5 inches", "6 inches",
+								"7 inches", "8 inches", "9 inches", "10 inches", "11 inches", "12 inches" },
+						{ /* Shapes */ "cube", "sphere", "pyramid", "cone" } },
 				{ // Grade 3
-						{}, { /* Pizza fractions */ "11", "12", "13", "14", "18", "23", "34" }, {},
+						{}, { /* Pizza fractions */ "11", "12", "13", "14", "18", "23", "34" },
+						{ /* Measure */ "0.5 inch", "1 inch", "1.5 inch", "2 inches", "2.5 inches", "3 inches",
+								"3.5 inches", "4 inches", "4.5 inches", "5 inches", "5.5 inches", "6 inches",
+								"6.5 inches", "7 inches", "7.5 inches", "8 inches", "8.5 inches", "9 inches",
+								"9.5 inches", "10 inches", "10.5 inches", "11 inches", "11.5 inches", "12 inches",
+								"12.5 inches" },
 						{ /* Shapes */ "cube", "sphere", "pyramid", "cone", "cylinder", "torus",
 								"rectangular prism" } },
 				{ // Grade 4
 						{}, {}, {}, { /* Shapes */ "cube", "sphere", "pyramid", "cone", "cylinder", "torus",
 								"rectangular prism", "triangular prism", "pentagonal prism" } } };
 
-		double[][][] imageRatioList = { { {}, {}, {}, { 1, 1, 1 } }, { {}, {}, {}, { 1, 1, 1, 2.19, 1.05, 1, 1 } },
-				{ {}, {}, {}, { 1.25, 0.95, 1.79, 1.24 } },
-				{ {}, { 1, 1, 1, 1, 1, 1, 1 }, {}, { 1.25, 0.95, 1.79, 1.24, 1.29, 1.37, 1.39 } },
-				{ {}, {}, {}, { 1.25, 0.95, 1.79, 1.24, 1.29, 1.37, 1.39, 1.99, 1.26 } } };
+		double[][][] imageRatioList = { { // Grade K
+				{}, {}, {}, { 1, 1, 1 } },
+				{ // Grade 1
+						{}, {}, {}, { 1, 1, 1, 2.19, 1.05, 1, 1 } },
+				{ // Grade 2
+						{}, {}, { 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86 },
+						{ 1.25, 0.95, 1.79, 1.24 } },
+				{ // Grade 3
+						{}, { 1, 1, 1, 1, 1, 1, 1 },
+						{ 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86,
+								1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86, 1.86 },
+						{ 1.25, 0.95, 1.79, 1.24, 1.29, 1.37, 1.39 } },
+				{ // Grade 4
+						{}, {}, {}, { 1.25, 0.95, 1.79, 1.24, 1.29, 1.37, 1.39, 1.99, 1.26 } } };
 
 		// Select array of question variables from above list
-
 		int selectionIndex = rand.nextInt(questionList[grade][category].length);
 		String question = questionList[grade][category][selectionIndex];
 		image += question + ".png";
 		imageRatio = imageRatioList[grade][category][selectionIndex];
-		// String[] elements = allElements[grade];
 
 		// Assign wrong answers
 		while (true) {
@@ -83,7 +101,12 @@ public class QuestionSingleImage extends Question {
 			}
 		}
 
-		if (grade == 3 && category == 1) {
+		// Assign correct question text prompt
+		if (grade == 1 && category == 2) {
+			questionText = "What time is it?";
+		} else if (grade == 2 && category == 2) {
+			questionText = "Choose the correct number of inches marked on the ruler";
+		} else if (grade == 3 && category == 1) {
 
 			questionText = "What is this fraction?";
 			image = "/pizza" + question + ".png";
